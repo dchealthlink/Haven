@@ -1,0 +1,145 @@
+<?php
+session_start();
+include("inc/dbconnect.php");
+
+$falseid = (date("y") * 10000000) + ((date("z") + 1) * 10000) ;
+
+$show_menu="ON";
+
+ include("inc/index_header_inc.php"); 
+?>
+<HTML>
+<head>
+</head>
+<tr><td>
+  <blockquote>
+   <h1>APTC check:</h1>
+
+   <form name="mainform" method="post" action="call_ws.php">
+
+<?
+        echo "<tr><td colspan=6>Name:&nbsp;&nbsp;&nbsp;<input class=pink type=text name=aptcName maxlength=70 size=40>";
+	echo '<input type=hidden name=applId value='.$falseid.'></td></tr>';
+	echo '<input type=hidden name=user value=100000></td></tr>';
+	echo "<tr><td colspan=10>&nbsp;</td></tr>";
+?>
+	<table border=0 cellspacing=0 cellpadding=2 bordercolor=#eeeeee width=800> 
+
+	<tr><td colspan=10><table border=1 width=700>
+	<td>Name</td>
+	<td>Age</td>
+	<td>HH Size</td>
+	<td>No. Deps</td>
+	<td>Income</td>
+	<td>Parent</td>
+	<td>Dependant</td>
+	<td>Pregnant</td>
+	<td>No. Kids</td>
+	</tr>
+
+<?
+if ($_GET['no'] > 0) {
+	$app_no = $_GET['no'];
+} else {
+	$app_no = 1;
+}
+	for($j=0; $j< $app_no; $j++) {
+
+        echo '<tr>';
+	echo '<td><input class=pink type=text name=aptc_array['.$j.'][0] maxlength=40 size=25></td>';
+        echo '<td>';
+  	echo '<select name=aptc_array['.$j.'][1]>';
+		for ($i=1;$i < 100;$i++) {
+	 		echo "<option value=".$i." >".$i."</option>";
+		}
+  	echo '</select>';
+	echo '</td>';
+	echo '<td>';
+  	echo '<select name="aptc_array['.$j.'][2]">';
+  		echo '<option value="1" selected>1</option>';
+
+		for ($i=2;$i < 10;$i++) {
+	 		echo "<option value=".$i." >".$i."</option>";
+		}
+
+  	echo '</select>';
+        echo '</td>';
+	echo '<td>';
+  	echo '<select name="aptc_array['.$j.'][3]">';
+  		echo '<option value="0" selected>0</option>';
+
+		for ($i=1;$i < 10;$i++) {
+	 		echo "<option value=".$i." >".$i."</option>";
+		}
+
+  	echo '</select>';
+        echo '</td>';
+        echo '<td><input class=pink type=text name=aptc_array['.$j.'][4] maxlength=10 size=9></td>';
+	echo '<td>';
+  	echo '<select name="aptc_array['.$j.'][5]" >';
+  		echo '<option value="N" selected>No</option>';
+	  	echo '<option value="Y" >Yes</option>';
+  	echo '</select>';
+	echo '</td>';
+	echo '<td>';
+  	echo '<select name="aptc_array['.$j.'][6]" >';
+  		echo '<option value="N" selected>No</option>';
+  		echo '<option value="Y" >Yes</option>';
+  	echo '</select>';
+	echo '</td>';
+	echo '<td>';
+  	echo '<select name="aptc_array['.$j.'][7]" >';
+  		echo '<option value="N" selected>No</option>';
+  		echo '<option value="Y" >Yes</option>';
+  	echo '</select>';
+	echo '</td>';
+	echo '<td>';
+  	echo '<select name="aptc_array['.$j.'][8]">';
+  		echo '<option value="0" selected>0</option>';
+
+		for ($i=1;$i < 10;$i++) {
+	 		echo "<option value=".$i." >".$i."</option>";
+		}
+
+  	echo '</select>';
+        echo '</td></tr>';
+
+	}
+?>
+	</table></td></tr>
+	<tr><td colspan=6>&nbsp;</td></tr>
+
+    	<tr>
+	<td align=right>Response Format:</td><td>
+  	<select name="responseFormat" >
+  		<option value="json" selected>JSON</option>
+  		<option value="xml" >XML</option>
+  	</select>
+        </td></tr>
+
+<?
+
+echo "<tr><td colspan=6>&nbsp;</td></tr>";
+// echo "<tr><td colspan=6><B>Additional Information:</B></td></tr>";
+
+echo "<br><br>";
+//    echo "<tr><td align=center colspan=2><b>---------------</a></b></td><td align=left colspan=2>------------------------------</td></tr>";
+
+
+
+
+
+?>
+
+    <tr>
+    <td colspan=2><input class="gray" type="Submit" name="submit" value="Submit"></td></tr>
+    </table>
+    </p>
+    </form>
+</blockquote>
+<?
+
+include "inc/footer_inc.php";
+?>
+</body>
+</HTML>

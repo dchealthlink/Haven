@@ -1,0 +1,304 @@
+<?php
+include("inc/qdbconnect.php");
+include ("inc/gen_functions_inc_test.php");
+$outfile = fopen("/tmp/ridp_obj_ws_".(date('Y-m-d')).".out","a+");
+/* require the user as the parameter */
+
+        $posts = array();
+
+        $postdata = file_get_contents("php://input");
+        fputs($outfile,date('Y-m-d h:i:s')." 2. -- ".$postdata."\n\n");
+
+        $deresult = json_decode($postdata,true) ;
+
+
+
+        $presql = "SELECT max(applId) + 1 from application WHERE postDate = now()::date ";
+        $preresult = execSql($db, $presql, $debug) ;
+        list($applId) = pg_fetch_row($preresult, 0);
+        if (!$applId) {
+                $applId = (date("y") * 10000000) + ((date("z") + 1) * 10000) + 1 ;
+        }
+
+
+	$form_array["element1"] = '1';
+	$element_array["id"] = 'id number';
+	$element_array["type"] = 'text';
+	$element_array["name"] = 'first name';
+	$element_array["caption"] = 'Please enter first name';
+	$element_array["mandatory"] = 'T';
+	$element_array["size"] = '20';
+	$element_array["length"] = '15';
+	$form_array["stuff1"] = $element_array;
+
+
+	$form_array["element2"] = '2';
+	$element_array["id"] = 'id number';
+	$element_array["type"] = 'text';
+	$element_array["name"] = 'last name';
+	$element_array["caption"] = 'Please enter last name';
+	$element_array["mandatory"] = 'T';
+	$element_array["size"] = '20';
+	$element_array["length"] = '15';
+	$form_array["stuff2"] = $element_array;
+
+        $posts["response id"] = $applId ;
+        $posts["response type"] = 'form';
+        $posts["version"] = '1.0' ;
+        $posts["action"] = 'this is the action';
+        $posts["method"] = 'get/post';
+	$posts["element"] = $form_array ;
+	
+
+	$men_array["get_citizen"] = "Collect Personal Info";
+	$men_array["whatever"] = "Do Something";
+	$men_array["logout"] = "Log Out";
+
+	$navmen_array["navmenu"] = $men_array;
+
+	$nav_array = $navmen_array;
+
+
+	$msg_array["topmessage"] = "By Clicking Below We Get to do Whatever We Want";
+	$msg_array["middlemessage"] = "Please answer questions below";
+
+	$msgmen_array["msgmenu"] = $msg_array;
+
+	$msg_array = $msgmen_array;
+// ----------------------------------------
+
+
+	$fld_val_con_sel["augusta"] = "Augusta";
+	$fld_val_con_sel["falmouth_heights"] = "Falmouth Heights";
+	$fld_val_con_sel["goethals"] = "Goethals";
+	$fld_val_con_sel["harrison"] = "Harrison";
+	$fld_val_con_sel["none"] = "None of the Above";
+
+	$fld_val_con["required"] = "true";
+	$fld_val_con["selection"] = $fld_val_con_sel ;
+	
+	$fld_val["type"] = "select";
+	$fld_val["label"] = "Options";
+	$fld_val["caption"] = "You Currently or Previously Resided At:";
+	$fld_val["format"] = "text";
+	$fld_val["constraint"] = $fld_val_con;
+
+	$fld_array["previous_residence"] = $fld_val;
+
+// ----
+
+	$fld_val_con_sel = "";
+	$fld_val_con_sel["1965to1974"] = "1965 to 1974";
+	$fld_val_con_sel["1975to1984"] = "1975 to 1984";
+	$fld_val_con_sel["1985to1994"] = "1985 to 1994";
+	$fld_val_con_sel["1995to2004"] = "1995 to 2004";
+	$fld_val_con_sel["none"] = "None of the Above";
+
+	$fld_val_con["required"] = "true";
+	$fld_val_con["selection"] = $fld_val_con_sel ;
+	
+	$fld_val["type"] = "select";
+	$fld_val["label"] = "Options";
+	$fld_val["caption"] = "Please Select the Range that includes the year your home was built:";
+	$fld_val["format"] = "text";
+	$fld_val["constraint"] = $fld_val_con;
+
+	$fld_array["built_range"] = $fld_val;
+
+// ----
+
+	$fld_val_con_sel = "";
+	$fld_val_con_sel["2"] = "2";
+	$fld_val_con_sel["3"] = "3";
+	$fld_val_con_sel["4"] = "4";
+	$fld_val_con_sel["5"] = "5";
+	$fld_val_con_sel["none"] = "None of the Above";
+
+	$fld_val_con["required"] = "true";
+	$fld_val_con["selection"] = $fld_val_con_sel ;
+	
+	$fld_val["type"] = "select";
+	$fld_val["label"] = "Options";
+	$fld_val["caption"] = "Please Select Number of Bedrooms:";
+	$fld_val["format"] = "text";
+	$fld_val["constraint"] = $fld_val_con;
+
+	$fld_array["num_bedrooms"] = $fld_val;
+
+// ----
+
+	$fld_val_con_sel = "";
+	$fld_val_con_sel["hsdiploma"] = "High School Diploma";
+	$fld_val_con_sel["somecollege"] = "Some College";
+	$fld_val_con_sel["bachelor"] = "Bachelor Degree";
+	$fld_val_con_sel["graduate"] = "Graduate Degree";
+	$fld_val_con_sel["none"] = "None of the Above";
+
+	$fld_val_con["required"] = "true";
+	$fld_val_con["selection"] = $fld_val_con_sel ;
+	
+	$fld_val["type"] = "select";
+	$fld_val["label"] = "Options";
+	$fld_val["caption"] = "Which of the following is the highest level of education you have completed?";
+	$fld_val["format"] = "text";
+	$fld_val["constraint"] = $fld_val_con;
+
+	$fld_array["education_level"] = $fld_val;
+
+// ----------------------------------------
+
+
+
+
+$post1["apikey"] = "abc123";
+$post1["event"] = "form";
+$post1["event_name"] = "RIDP_Validation";
+$post1["version"] = "1.0";
+$post1["title"] = "Citizen Confirmation Screen";
+$post1["navigation"] = $nav_array;
+$post1["message"] = $msg_array;
+$post1["field"] = $fld_array;
+
+$outArray = json_encode($post1, true);
+fputs($outfile,date('Y-m-d h:i:s')." 3. -- ".$japArray."\n\n");
+/*
+$outArray = '{
+"apikey":"abc123", 
+"event":"form",
+"event_name":"RIDP_Validation",
+"version":"1.0",
+"title":"Citizen Confirmation Screen",
+"header":"Confirm Citizen Info",
+"action": null,
+"userid": "1234567890",
+"user_firstname":"Robert",
+"user_lastname":"Smith",
+"role":"citizen",
+
+	"navigation": {
+		"navmenu": {
+			"first_choice": {
+				"type":"selection",
+				"label":"Collect Personal Info",
+				"action":"get_citizen"
+			},
+			"second_choice": {
+				"type":"selection"
+				"label":"Do Something",
+				"action":"whatever"
+			},
+			"logout_choice": {
+				"type":"selection"
+				"label":"Log Out",
+				"action":"logout"
+			}
+	},
+
+	"message": {
+		"topmessage": {
+			"type":"confirm",
+			"text":"By clicking below, you authorize DCHBX to do whatever it is going to do with your data",
+			"prompt": "I agree",
+			"value": null,
+			"constraint": {
+				"required":true
+			}
+		},
+		"middlemessage" {
+			"type":"info",
+			"text":"Please answer the questions below, or else"
+		}
+	}.
+
+	"field": {
+		"previous_residence": {
+			"type": "select",
+			"label" : "Options",
+			"caption": "You currently or previously resided on one of the following streets.  Please select the street name from the following choices",
+			"value" : null,
+			"format" : "text",
+			"contstraint": {
+				"required": true,
+				"selection": {
+					"augusta":"Augusta",
+					"falmouth heights":"Fallmouth Heights",
+					"goethals":"Goethals",
+					"harrison":"Harrison",
+					"none":"None of the above"
+				}
+			},
+		"home_built_range": {
+			"type": "select",
+			"label" : "Options",
+			"caption": "Please select the range that includes the year the home was build for the address that you provided",
+			"value" : null,
+			"format" : "text",
+			"contstraint": {
+				"required": true,
+				"selection": {
+					"1965to1974":"1965 to 1974",
+					"1975to1984":"1975 to 1984",
+					"1985to1994":"1985 to 1994",
+					"1995to2004":"1995 to 2004",
+					"none":"None of the above"
+				}
+		},
+		"num_bedrooms": {
+			"type": "select",
+			"label" : "Options",
+			"caption": "Please select the number of bedrooms in your home from the following choices.  If the number of bedrooms in your home is not one of the choices please select None of the Above",
+			"value" : null,
+			"format" : "text",
+			"contstraint": {
+				"required": true,
+				"selection": {
+					"2":"2",
+					"3":"3",
+					"4":"4",
+					"5":"5",
+					"none":"None of the above"
+				}
+		},
+		"education_level": {
+			"type": "select",
+			"label" : "Options",
+			"caption": "Which of the following is the highest level of education you have completed? If there is not a matched educational level, please select None of the Above",
+			"value" : null,
+			"format" : "text",
+			"contstraint": {
+				"required": true,
+				"selection": {
+					"high_school_diploma":"High School Diploma",
+					"some_college":"Some College",
+					"bachelor_degree":"Bachelor Degree",
+					"graduate_degree":"Graduate Degree",
+					"none":"None of the above"
+				}
+		}
+	},
+	"navigation": {
+		"buttonmenu": {
+			"submit": {
+				"type":"submit"
+				"label":"Submit",
+				"action":"submit"
+			},
+			"next": {
+				"type":"button"
+				"label":"Next",
+				"action":"nextform"
+			},
+			"reset": {
+				"type":"reset"
+				"label":"Reset",
+				"action":"reset"
+			}
+		}
+	}
+
+}' ;
+*/
+echo $outArray ;
+
+?>
+

@@ -1,0 +1,101 @@
+<?php
+session_start();
+include("inc/dbconnect.php");
+
+if ($formmenu) {
+  	header("location: us_menu.php");
+	exit;
+}
+
+if ($formcopy) {
+                $nextsql = "select  '".$_POST['projectId']."'||'-'||lpad(coalesce(max(userstorynum) + 1,1),4,'0') as nextnum, coalesce(max(userstorynum) + 1,1) as thenumber FROM user_story WHERE projectid = '".$projectId."'";
+                $nextresult = execSql($db, $nextsql, $debug);
+                list($usId, $usNumber) = pg_fetch_row($nextresult,0);
+
+		$sql = "insert into user_story (userstoryid , userstoryversion , userstoryname , value_statement , status , iteration, plan_estimate , todo, owner, status_timestamp, created_by, us_tier, projectid, userstorynum ) values ('".$usId."','".$_POST['userstoryVersion']."','copy of '||upper('".$_POST['userstoryName']."'),'".$_POST['valueStatement']."', '".$_POST['status']."','".$_POST['iteration']."','".$_POST['planEstimate']."','".$_POST['toDo']."', '".$_SESSION['userid']."',   now(), '".$_SESSION['userid']."','".$_POST['usTier']."','".$_POST['projectId']."',".$usNumber."  ) ";
+
+		$sql = str_replace("''","null",$sql);
+		$sql = str_replace("'null'","null",$sql);
+		$result = execSql($db,$sql,$debug) ;
+
+}
+if ($formsubmit) {
+
+	$presql = "SELECT count(*) from user_story WHERE userstoryid = '".$_POST['userstoryId']."'";
+	$preresult = execSql($db,$presql,$debug) ;
+	list($precount) = pg_fetch_row($preresult,0);
+
+	if ($precount == 0) {
+
+                $nextsql = "select  '".$_POST['projectId']."'||'-'||lpad(coalesce(max(userstorynum) + 1,1),4,'0') as nextnum, coalesce(max(userstorynum) + 1,1) as thenumber  FROM user_story WHERE projectid = '".$projectId."'";
+                $nextresult = execSql($db, $nextsql, $debug);
+                list($usId, $usNumber) = pg_fetch_row($nextresult,0);
+
+
+		$sql = "insert into user_story (userstoryid , userstoryversion , userstoryname , value_statement , status , iteration, plan_estimate , todo, owner, status_timestamp, created_by, us_tier, projectid ) values ('".$usId."','".$_POST['userstoryVersion']."',upper('".$_POST['userstoryName']."'),'".$_POST['valueStatement']."', '".$_POST['status']."','".$_POST['iteration']."','".$_POST['planEstimate']."','".$_POST['toDo']."', '".$_SESSION['userid']."',   now(), '".$_SESSION['userid']."','".$_POST['usTier']."','".$_POST['projectId']."', ".$usNumber."   ) ";
+
+	} else {
+		$usId = $_POST['userstoryId'];
+
+		$sql = "UPDATE user_story set ";
+		$sql.= "userstoryversion   = '".$_POST['userstoryVersion']."', ";
+		$sql.= "userstoryname   = upper('".$_POST['userstoryName']."'), ";
+		$sql.= "value_statement   = '".$_POST['valueStatement']."', ";
+		$sql.= "status   = '".$_POST['status']."', ";
+		$sql.= "us_tier   = '".$_POST['usTier']."', ";
+		$sql.= "projectid   = '".$_POST['projectId']."', ";
+		$sql.= "owner   = '".$_SESSION['userid']."', ";
+		$sql.= "status_timestamp   = now() ";
+		$sql.= " WHERE userstoryid = '".$usId."'  and (";
+		$sql.= "userstoryversion   != '".$_POST['userstoryVersion']."' OR ";
+		$sql.= "userstoryname   != upper('".$_POST['userstoryName']."') OR ";
+		$sql.= "value_statement   != '".$_POST['valueStatement']."' OR ";
+		if ($_POST['iteration']) {
+			$sql.= "iteration  != '".$_POST['iteration']."' OR ";
+		}
+		if ($_POST['planEstimate']) {
+			$sql.= " plan_estimate  != '".$_POST['planEstimate']."' OR ";
+		}
+		if ($_POST['toDo']) {
+			$sql.= "todo   = '".$_POST['toDo']."' OR ";
+		}
+		$sql.= " status   != '".$_POST['status']."' ) ";
+	}
+		$sql = str_replace("''","null",$sql);
+		$sql = str_replace("'null'","null",$sql);
+		$result = execSql($db,$sql,$debug) ;
+
+	if ($_POST['actionType']) {
+			$presql = "SELECT max(action_inc) + 1 FROM user_story_action WHERE userstoryid = '".$usId."' AND action_type = '".$_POST['actionType']."' ";
+			$preresult = execSql($db,$presql,$debug) ;
+			list ($nextval) = pg_fetch_row($preresult,0) ;
+			$nextval = $nextval ? $nextval : 1;
+
+		switch ($_POST['actionType']) {
+		case 'superordinate':	
+
+			$presql = "SELECT max(action_inc) + 1 FROM user_story_action WHERE userstoryid = '".$usId."' AND action_type = 'subordinate' ";
+			$preresult = execSql($db,$presql,$debug) ;
+			list ($nextval) = pg_fetch_row($preresult,0) ;
+			$nextval = $nextval ? $nextval : 1;
+
+
+			$sql = "INSERT INTO user_story_action (userstoryid, action_type, action_inc, action_value, owner, status_timestamp) values ('".$_POST['selecteduserStoryId']."','subordinate','".$nextval."','".$usId."','".$_SESSION['userid']."', now() ) ";
+		break;
+		default:	
+			$sql = "INSERT INTO user_story_action (userstoryid, action_type, action_inc, action_value, owner, status_timestamp, comments) values ('".$usId."','".$_POST['actionType']."','".$nextval."','".$_POST['nextStep']."','".$_SESSION['userid']."', now(), '".$_POST['comments']."' ) ";
+		break;
+		}
+		$sql = str_replace("''","null",$sql);
+		$result = execSql($db,$sql,$debug) ;
+
+
+	}
+
+}
+
+ header("location: us_form.php?usId=".$usId);
+
+
+?>
+

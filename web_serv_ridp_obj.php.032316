@@ -1,0 +1,284 @@
+<?php
+include("inc/qdbconnect.php");
+include ("inc/gen_functions_inc_test.php");
+$outfile = fopen("/tmp/ridp_obj_ws_".(date('Y-m-d')).".out","a+");
+/* require the user as the parameter */
+
+        $posts = array();
+
+        $postdata = file_get_contents("php://input");
+        fputs($outfile,date('Y-m-d h:i:s')." 2. -- ".$postdata."\n\n");
+
+        $deresult = json_decode($postdata,true) ;
+
+
+
+        $presql = "SELECT max(applId) + 1 from application WHERE postDate = now()::date ";
+        $preresult = execSql($db, $presql, $debug) ;
+        list($applId) = pg_fetch_row($preresult, 0);
+        if (!$applId) {
+                $applId = (date("y") * 10000000) + ((date("z") + 1) * 10000) + 1 ;
+        }
+
+
+	$form_array["element1"] = '1';
+	$element_array["id"] = 'id number';
+	$element_array["type"] = 'text';
+	$element_array["name"] = 'first name';
+	$element_array["caption"] = 'Please enter first name';
+	$element_array["mandatory"] = 'T';
+	$element_array["size"] = '20';
+	$element_array["length"] = '15';
+	$form_array["stuff1"] = $element_array;
+
+
+	$form_array["element2"] = '2';
+	$element_array["id"] = 'id number';
+	$element_array["type"] = 'text';
+	$element_array["name"] = 'last name';
+	$element_array["caption"] = 'Please enter last name';
+	$element_array["mandatory"] = 'T';
+	$element_array["size"] = '20';
+	$element_array["length"] = '15';
+	$form_array["stuff2"] = $element_array;
+
+        $posts["response id"] = $applId ;
+        $posts["response type"] = 'form';
+        $posts["version"] = '1.0' ;
+        $posts["action"] = 'this is the action';
+        $posts["method"] = 'get/post';
+	$posts["element"] = $form_array ;
+	
+
+	$men_array["get_citizen"] = "Collect Personal Info";
+	$men_array["whatever"] = "Do Something";
+	$men_array["logout"] = "Log Out";
+
+	$navmen_array["navmenu"] = $men_array;
+
+	$nav_array = $navmen_array;
+
+
+	$msg_array["topmessage"] = "By Clicking Below We Get to do Whatever We Want";
+	$msg_array["middlemessage"] = "Please answer questions below";
+
+	$msgmen_array["msgmenu"] = $msg_array;
+
+	$msg_array = $msgmen_array;
+// ----------------------------------------
+
+
+	$fld_val_con_sel["augusta"] = "Augusta";
+	$fld_val_con_sel["falmouth_heights"] = "Falmouth Heights";
+	$fld_val_con_sel["goethals"] = "Goethals";
+	$fld_val_con_sel["harrison"] = "Harrison";
+	$fld_val_con_sel["none"] = "None of the Above";
+
+	$fld_val_con["required"] = "true";
+	$fld_val_con["selection"] = $fld_val_con_sel ;
+	
+	$fld_val["type"] = "select";
+	$fld_val["label"] = "Options";
+	$fld_val["caption"] = "You Currently or Previously Resided At:";
+	$fld_val["format"] = "text";
+	$fld_val["constraint"] = $fld_val_con;
+
+	$fld_array["previous_residence"] = $fld_val;
+
+// ----
+
+	$fld_val_con_sel = "";
+	$fld_val_con_sel["1965to1974"] = "1965 to 1974";
+	$fld_val_con_sel["1975to1984"] = "1975 to 1984";
+	$fld_val_con_sel["1985to1994"] = "1985 to 1994";
+	$fld_val_con_sel["1995to2004"] = "1995 to 2004";
+	$fld_val_con_sel["none"] = "None of the Above";
+
+	$fld_val_con["required"] = "true";
+	$fld_val_con["selection"] = $fld_val_con_sel ;
+	
+	$fld_val["type"] = "select";
+	$fld_val["label"] = "Options";
+	$fld_val["caption"] = "Please Select the Range that includes the year your home was built:";
+	$fld_val["format"] = "text";
+	$fld_val["constraint"] = $fld_val_con;
+
+	$fld_array["built_range"] = $fld_val;
+
+// ----
+
+	$fld_val_con_sel = "";
+	$fld_val_con_sel["2"] = "2";
+	$fld_val_con_sel["3"] = "3";
+	$fld_val_con_sel["4"] = "4";
+	$fld_val_con_sel["5"] = "5";
+	$fld_val_con_sel["none"] = "None of the Above";
+
+	$fld_val_con["required"] = "true";
+	$fld_val_con["selection"] = $fld_val_con_sel ;
+	
+	$fld_val["type"] = "select";
+	$fld_val["label"] = "Options";
+	$fld_val["caption"] = "Please Select Number of Bedrooms:";
+	$fld_val["format"] = "text";
+	$fld_val["constraint"] = $fld_val_con;
+
+	$fld_array["num_bedrooms"] = $fld_val;
+
+// ----
+
+	$fld_val_con_sel = "";
+	$fld_val_con_sel["hsdiploma"] = "High School Diploma";
+	$fld_val_con_sel["somecollege"] = "Some College";
+	$fld_val_con_sel["bachelor"] = "Bachelor Degree";
+	$fld_val_con_sel["graduate"] = "Graduate Degree";
+	$fld_val_con_sel["none"] = "None of the Above";
+
+	$fld_val_con["required"] = "true";
+	$fld_val_con["selection"] = $fld_val_con_sel ;
+	
+	$fld_val["type"] = "select";
+	$fld_val["label"] = "Options";
+	$fld_val["caption"] = "Which of the following is the highest level of education you have completed?";
+	$fld_val["format"] = "text";
+	$fld_val["constraint"] = $fld_val_con;
+
+	$fld_array["education_level"] = $fld_val;
+
+// ----------------------------------------
+
+
+
+
+$post1["apikey"] = "abc123";
+$post1["event"] = "form";
+$post1["event_name"] = "RIDP_Validation";
+$post1["version"] = "1.0";
+$post1["title"] = "Citizen Confirmation Screen";
+
+$post0 = " { ";
+$eventsql = "SELECT * from event WHERE eventid = 'event1'";
+$eventresult = execSql($db, $eventsql, $debug) ;
+list ($apikey, $event_role, $event, $event_name, $version, $event_title, $event_header) = pg_fetch_row($eventresult, 0);
+
+$post1["apikey"] = $apikey;
+$post1["event"] = $event;
+$post1["event_name"] = $event_name;
+$post1["version"] = $version;
+$post1["title"] = $event_title;
+$post1["header"] = $event_header;
+$post0.= ' "apikey" : "'.$apikey.'", ';
+$post0.=' "event" : "'.$event.'", ';
+$post0.=' "event_name" : "'.$event_name.'", ';
+$post0.=' "version" : "'.$version.'", ';
+$post0.=' "title" : "'.$event_title.'", ';
+$post0.=' "header" : "'.$event_header.'", ';
+
+/* -- event element -- */
+$event_elementsql = "SELECT element, element_value from event_element WHERE eventid = '".$apikey."' ORDER BY sort_order";
+$event_elementresult = execSql($db, $event_elementsql, $debug) ;
+
+   $row1 = 0;
+   $array1 = '';
+   while ($row = pg_fetch_array($event_elementresult,$row1)) {
+   list ($element, $element_value) = pg_fetch_row($event_elementresult, $row1);
+      if ($element_value == 'array') {
+         echo "<br>".$element." { ";
+			$array1.= '"'.$element.'" : { ';
+         $event_element_typesql = "SELECT element_type, element_type_value from event_element_type WHERE eventid = '".$apikey."' and element = '".$element."' ORDER BY sort_order";
+         $event_element_typeresult = execSql($db, $event_element_typesql, $debug) ;
+         $row2 = 0;
+   $array2 = '';
+         while ($row = pg_fetch_array($event_element_typeresult,$row2)) {
+         list ($element_type, $element_type_value) = pg_fetch_row($event_element_typeresult, $row2);
+            if ($element_type_value == 'array') {
+               echo "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$element_type." { ";
+			$array2.= '"'.$element_type.'" : { ';
+               $event_element_type_itemsql = "SELECT element_type_item, element_type_item_value from event_element_type_item WHERE eventid = '".$apikey."' and element = '".$element."' and element_type = '".$element_type."' ORDER BY sort_order";
+               $event_element_type_itemresult = execSql($db, $event_element_type_itemsql, $debug) ;
+               $row3 = 0;
+   $array3 = '';
+               while ($row = pg_fetch_array($event_element_type_itemresult,$row3)) {
+               list ($element_type_item, $element_type_item_value) = pg_fetch_row($event_element_type_itemresult, $row3);
+                  if ($element_type_item_value == 'array') {
+                     echo "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$element_type_item." { ";
+			$array3.= '"'.$element_type_item.'" : { ';
+                     $event_element_type_item_datasql = "SELECT element_type_item_data, element_type_item_data_value from event_element_type_item_data WHERE eventid = '".$apikey."' and element = '".$element."' and element_type = '".$element_type."' and element_type_item = '".$element_type_item."' ORDER BY sort_order";
+                     $event_element_type_item_dataresult = execSql($db, $event_element_type_item_datasql, $debug) ;
+                     $row4 = 0;
+   $array4 = '';
+                     while ($row = pg_fetch_array($event_element_type_item_dataresult,$row4)) {
+                     list ($element_type_item_data, $element_type_item_data_value) = pg_fetch_row($event_element_type_item_dataresult, $row4);
+                        if ($element_type_item_data_value == 'array') {
+                           echo '<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"'.$element_type_item_data.'" { ';
+			$array4.= '"'.$element_type_item_data.'" : { ';
+
+
+                           $event_element_type_item_data_conssql = "SELECT element_type_item_data_cons, element_type_item_data_cons_value from event_element_type_item_data_cons WHERE eventid = '".$apikey."' and element = '".$element."' and element_type = '".$element_type."' and element_type_item = '".$element_type_item."' and element_type_item_data ='".$element_type_item_data."' ORDER BY sort_order";
+                     $event_element_type_item_data_consresult = execSql($db, $event_element_type_item_data_conssql, $debug) ;
+                     $row5 = 0;
+			$array5 = '';
+                     while ($row = pg_fetch_array($event_element_type_item_data_consresult,$row5)) {
+                     list ($element_type_item_data_cons, $element_type_item_data_cons_value) = pg_fetch_row($event_element_type_item_data_consresult, $row5);
+                        if ($element_type_item_data_cons_value == 'array') {
+                           echo "<br>Another Level?";
+                        } else {
+                           echo '<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"'.$element_type_item_data_cons.'" : "'.$element_type_item_data_cons_value.'" , ';
+			$array5.= '"'.$element_type_item_data_cons.'" : "'.$element_type_item_data_cons_value.'" ,';
+                        }
+				$row5 = $row5 + 1;
+                      }
+			$array5 = substr($array5,0,-1).' } ,';
+			echo "<br>Array5 ==> ".$array5;
+			$array4.= $array5 ;
+
+                        } else {
+                           echo '<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"'.$element_type_item_data.'" : "'.$element_type_item_data_value.'" , ';
+			$array4.= '"'.$element_type_item_data.'" : "'.$element_type_item_data_value.'" ,'; 
+                        }
+				$row4 = $row4 + 1;
+                     }
+			$array4 = substr($array4,0,-1).' } ,';
+			echo "<br>Array4 ==> ".$array4;
+			$array3.= $array4 ;
+                  } else {
+                     echo '<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"'.$element_type_item.'" : "'.$element_type_item_value.'" , ';
+			$array3.= '"'.$element_type_item.'" : "'.$element_type_item_value.'" ,'; 
+                  }
+			$row3 = $row3 + 1;
+               }
+			$array3 = substr($array3,0,-1).' } ,';
+			echo "<br>Array3 ==> ".$array3;
+			$array2.= $array3 ;
+            } else {
+               echo "<br>ELEMENT_TYPE_VALUE ==> ".$element_type." { ".$element_type_value." }, ";
+            }
+		$row2 = $row2 + 1;
+         }
+			$array2 = substr($array2,0,-1).' } ,';
+			echo "<br>Array2 ==> ".$array2;
+			$array1.= $array2 ;
+      } else {
+         echo "<br>ELEMENT_VALUE ==> ".$element." { ".$element_value." }, ";
+      }
+	$row1 = $row1 + 1;
+   }
+
+			$array1 = substr($array1,0,-1).' } ';
+			echo "<br>Array1 ==> ".$array1;
+			$post0.= $array1;
+
+$post1["navigation"] = $nav_array;
+$post1["message"] = $msg_array;
+$post1["field"] = $fld_array;
+
+echo "<br><br>".$post0;
+$outArray = json_encode($post1, true);
+fputs($outfile,date('Y-m-d h:i:s')." 3. -- ".$japArray."\n\n");
+/*
+*/
+echo "<br><br><br><br>";
+echo $outArray ;
+
+?>
+
