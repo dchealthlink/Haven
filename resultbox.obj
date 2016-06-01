@@ -1,0 +1,53 @@
+<?php
+/*
+This is not dissimilar to the linkbox class, except there is not HREF link invovled. instead we create a two-column nested table and place the parsed data into it.
+*/
+class resultbox extends genericinfo {
+    /*
+        Set up the Object. You will notice, we have not reserved memory 
+        space for variables. In this circumstance it is not necessary.
+    */
+
+    //constructor
+    function resultbox() {
+        $this->genericinfo();
+    }
+    /*
+        This is the only method within the class. Quite simply, as you can see 
+        it draws the table(s), placing the required data in the appropriate place.
+    */    
+    function drawresultbox() {
+
+        echo("<TABLE BORDER=\"$this->outerborderwidth\" CELLPADDING=\"0\" CELLSPACING=\"0\" WIDTH=\"$this->outerwidth\" BORDERCOLOR=\"$this->outerbordercolor\" BGCOLOR=\"$this->titlebgcolor\">");
+        echo("<TR>");
+        echo("<TD>");
+        if (isset($this->cssboxtitle)) {
+            echo("<DIV CLASS=\"" . $this->getcssboxtitle() . "\">");
+            echo($this->title);
+            echo("</DIV>");
+        } else {
+            echo($this->title);
+        }
+        echo("</TD>");
+        echo("</TR>");
+        echo("<TR>");
+        echo("<TD>");
+        echo("<TABLE BORDER=\"0\" CELLPADDING=\"0\" CELLSPACING=\"0\" WIDTH=\"$this->innerwidth\" BGCOLOR=\"$this->innerbgcolor\">");
+        for ($x = 0; $x < count($this->data); $x++) {
+            echo("<TR>");
+            echo("<TD>");
+            echo($this->data[$x][0]);
+            echo("</TD>");
+            echo("<TD>");
+            echo($this->data[$x][1]);
+            echo("</TD>");
+            echo("</TR>");
+        }
+        echo("</TABLE>");
+        echo("</TD>");
+        echo("</TR>");
+        echo("</TABLE>");
+    }
+}
+
+?>

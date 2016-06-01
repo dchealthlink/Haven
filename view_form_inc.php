@@ -1,5 +1,5 @@
+<!-- view_form_inc.php -->
 <?php
-/* -- view_form_inc.php -- */
 
 if (!$acc_method) {
 	$acc_method = "view";
@@ -13,14 +13,11 @@ if (!$sql) {
 	}
 }
 
-if ($checkorder != 'NO') {
-if ($order_field AND $checkorder!="NO") {
+if ($order_field) {
 	$sql.= " order by ".$order_field.", 1, 2 ";
 } else {
 	$sql.= " order by 1, 2 ";
 }
-}
-
 $result = execSql($db, $sql, $debug);
 
 $rownum = 0;
@@ -35,12 +32,12 @@ if (!$orient)  {
 }
 
 if (!$setborder) {
-	$setborder = 1;
+	$setborder = 0;
 }
 ?>
 <table border=<?php echo $setborder ?>> 
 <?
-/* echo("<TR BGCOLOR=#f5f5f5>"); */
+echo("<TR BGCOLOR=#f5f5f5>");
 if ($orient == "horizontal") {
 
 if ($num_rows > 0) {
@@ -56,9 +53,9 @@ if ($num_rows > 0) {
 		if ($list_label != "N") {
 
 		if ($label_value) {
-	        	echo "<td><a href='".$PHP_SELF."?".$form_label_value.$init_get_value."order_field=".$header_value."'>".$label_value."</a></td>";
+	        	echo "<td><a href='".$PHP_SELF."?".$init_get_value."order_field=".$header_value."'>".$label_value."</a></td>";
 		} else {
-	        	echo "<td><b><a href='".$PHP_SELF."?".$form_label_value.$init_get_value."order_field=".$header_value."'>".ucwords(ereg_replace("_"," ",$header_value))."</a></b></td>";
+	        	echo "<td><b><a href='".$PHP_SELF."?".$init_get_value."order_field=".$header_value."'>".ucwords(ereg_replace("_"," ",$header_value))."</a></b></td>";
 
 		}
 
@@ -107,28 +104,7 @@ while ($row = pg_fetch_array($result,$rownum)) {
 
 
 				if ($i == 0 && $hlink != 'N') {
-					if (empty($link_reference)) {
-       					echo "<td colspan=7>".$data_value."</td></tr>";  
-					} else {
-/* =============== starting here ================ */
-						if (substr($link_reference,0,3) == 'pop:') {
-
-							$link_array = explode(":",$link_reference);
-
-
-                                                        echo "<td colspan=7><b>";
-                                                        echo "<a href=# onClick=javascript:window.open('".$link_array[1].(urlencode($data_value))."','".$link_array[2]."','".$link_array[3]."') >";
-                                                        echo $data_value."</a></b>here</td></tr>";
-
-
-						} else {
-
-
-       							echo "<td colspan=7><b><a href=".$link_reference.(urlencode($data_value)).">".$data_value."</a></b>here1</td></tr>";   
-						}
-
-					}
-
+       					echo "<td colspan=7><b><a href=".$link_reference.(urlencode($data_value)).">".$data_value."</a></b></td></tr>";  
 				} else {
 
 					$data_description="";
@@ -182,39 +158,7 @@ while ($row = pg_fetch_array($result,$rownum)) {
 		} else {
 
 			if ($i == 0 && $hlink != 'N') {
-                             if (empty($link_reference)) {
-                                     echo "<td>".$data_value."</td>";
-                             } else {
-
-/* ============== second instance starting here ============== */
-                                                if (substr($link_reference,0,3) == 'pop') {
-
-                                                        $link_array = explode(":",$link_reference);
-                                                        
-                                                        echo "<td><b>";
-							echo "<a href=\"#\" onClick=\"javascript:window.open('".$link_array[1].(urlencode($data_value))."','".$link_array[2]."','".$link_array[3]."')\" >"; 
-							echo $data_value."</a>here2</b></td>";  
-
-
-                                                } else {
-
-
-
-					if (stripos($link_reference,'|')) {
-						$lpos = stripos($link_reference,'|');
-						$rpos = strrpos($link_reference,'|');
-						$betw_val = substr($link_reference,$lpos+1,$rpos-($lpos+1));
-						$new_reference=ereg_replace("\|".$betw_val."\|",$row[pg_fieldname($result,$betw_val)],$link_reference); 
-					} else  {
-						$new_reference = $link_reference;
-					} 
-
-                                     echo "<td><b><a href=".$new_reference.(urlencode($data_value)).">".$data_value."</a></b></td>";
-				$this_pay_method = $data_value;
-						}
-                             }
-
-
+       				echo "<td><b><a href=".$link_reference.(urlencode($data_value)).">".$data_value."</a></b></td>";  
 /*
 			} else if ($i == 1 && $hlink != 'N') {
         			echo "<td><b><a href=".$PHP_SELF."?".$header_value."=".(urlencode($data_value)).">".$data_value."</a></b></td>";
@@ -222,8 +166,7 @@ while ($row = pg_fetch_array($result,$rownum)) {
 
 			} else {
 
-//herehere
-				if ($data_value or strlen($data_value) > 0) {
+				if ($data_value) {
 
 				if ($header_value == 'password') {
 					echo "<td>***********</td>";
@@ -232,12 +175,6 @@ while ($row = pg_fetch_array($result,$rownum)) {
 						echo "<td align=right>".$data_value."</td>";
 					} else {
 						echo "<td>".$data_value."</td>";
-						if ($header_value == 'pay_seq') {
-							$this_pay_seq = $data_value;
-						}
-						if ($header_value == 'status') {
-							$this_status = $data_value;
-						}
 					}
 				}
 				} else {
@@ -250,17 +187,6 @@ while ($row = pg_fetch_array($result,$rownum)) {
 
 	}
 
-if ($header_table == 'xa_pay_log' AND ($this_status == 'PP' or $this_status == 'PD')) {
-			if ($this_pay_method == 'MCHECK' OR $this_pay_method == 'CASH' OR $this_pay_method == 'MONEYORD') {
-        			echo "<td>&nbsp</td><td><b><a href=void_pay_seq.php?xa_id=".$xa_id."&pay_seq=".$this_pay_seq."&cashier_id=".$temp_cashier_id."&upd_status=VD onclick=\"goTo(this.href, 'VOID','".$xa_id."','".$this_pay_seq."'); return false\">VOID</a></b></td>";
-			}
-			if ($this_pay_method == 'MCHECK') {
-        			echo "<td>&nbsp</td><td><b><a href=void_pay_seq.php?xa_id=".$xa_id."&pay_seq=".$this_pay_seq."&cashier_id=".$temp_cashier_id."&upd_status=RM onclick=\"goTo(this.href, 'NSF REVERSE','".$xa_id."','".$this_pay_seq."'); return false\">NSF REVERSE</a></b></td>";
-			}
-}
-
-
-
 	echo "</tr>";
 if (($rownum % 2) != 0) {
 	echo ("<TR>");
@@ -269,10 +195,6 @@ if (($rownum % 2) != 0) {
 }
 	$rownum = $rownum + 1;
 }
-
-
-
-
 if ($num_rows > 0) {
 if($sumsql) {
 echo "<tr>";
@@ -283,7 +205,7 @@ while ($row = pg_fetch_array($result,$rownum)) {
 	for ($i = 0; $i < $fieldnum; $i++) {
         	$ftype = pg_field_type($result,$i);
 		$data_value = $row[pg_fieldname($result,$i)];
-		if ($ftype == 'numeric') {
+		if ($ftype == 'numeric' or $ftype == 'integer' or $ftype == 'int2' or $ftype == 'int4' or $ftype == 'int8') {
 			echo "<td align=right>".$data_value."</td>";
 		} else {
 			echo "<td>".$data_value."</td>";

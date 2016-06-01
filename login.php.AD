@@ -1,0 +1,106 @@
+<?php
+include("inc/config.php");
+$connection = pg_connect("host=localhost dbname=legacy user=root") or die ("Unable to connect!");
+
+include (dirname(__FILE__) . "/adLdap/src/adLDAP.php");
+
+//Connect to AD server
+try {
+    $adldap = new adLDAP($options);
+}
+catch (adLDAPException $e) {
+    echo $e;
+    exit();
+}
+
+
+// authenticate a username/password
+/*
+if (1) {
+        $result = $adldap->authenticate($adUser, $adUserPassword);
+        print "Result from the authenticate username/password\n\n\n";
+        var_dump($result);
+}
+*/
+
+
+if ($adldap->authenticate($name, $password) ) {
+
+
+$query = "SELECT user_id, user_name, user_type, password, email, debug, notify, start_proc, start_key, start_fld, user_level, verbose_flag , splash_flag FROM app_user WHERE user_id = '$name'";
+/* $query.= " AND (password = '".$password."' OR user_id = 'admin' OR (password = '".crypt($password,$name)."'))";  */
+$result = pg_exec($connection, $query);
+if (pg_numrows($result) == 1)
+	{
+	session_start();
+
+	session_register("userid");
+	session_register("username");
+	session_register("useremail");
+	session_register("usertitle");
+	session_register("usertype");
+	session_register("debug");
+	session_register("notify");
+	session_register("startproc");
+	session_register("userverbose");
+	session_register("usersplash");
+	session_register("key_attribute");
+	session_register("key_value");
+	session_register("userlevel");
+	session_register("show_menu");
+
+	list($userid, $username, $user_type, $pass, $useremail, $debug, $notify, $start_proc, $start_key, $start_fld, $user_level, $user_verbose, $user_splash) = pg_fetch_row($result, 0); 
+
+	$userid = $userid;
+	$username = $username;
+	$user_email = $useremail;
+	$user_title = $usertitle;
+	$usertype = $user_type;
+	$startproc = $start_proc;
+	$key_attribute = $start_fld;
+	$key_value = $start_key;
+	$userverbose = $user_verbose;
+	$usersplash = $user_splash;
+
+	$userlevel = $user_level;
+	$show_menu = "ON";
+	
+	$sql = "INSERT INTO USER_LOGIN (user_id, password, login_timestamp, user_type, start_proc, start_key, start_fld, user_ip, success_fail) values ('".$userid."','".crypt($password,$name)."',now(),'".$usertype."','".$start_proc."','".$start_key."','".$start_fld."','".$REMOTE_ADDR."','S')";
+	$result1 = pg_exec($connection, $sql);
+        if(pg_ErrorMessage($connection))
+                {
+                DisplayErrMsg(sprintf("Executing %s ", $sql)) ;
+                DisplayErrMsg(sprintf("Error: %s", pg_ErrorMessage($db))) ;
+                };
+
+
+        if ($usersplash == 'Y') {
+                header("Location: splash_module.php" );
+        } else {
+                header("Location: ".$startproc );
+        }
+	pg_free_result ($result);
+	pg_free_result ($result1);
+	pg_close($connection); 
+	}
+
+	}
+/* will be moving the above */
+else
+
+	{
+	$sql = "INSERT INTO USER_LOGIN (user_id, password, login_timestamp, user_ip, success_fail) values ('".$name."','".$password."',now(),'".$REMOTE_ADDR."','F')";
+	$result1 = pg_exec($connection, $sql);
+        if(pg_ErrorMessage($connection))
+                {
+                DisplayErrMsg(sprintf("Executing %s ", $sql)) ;
+                DisplayErrMsg(sprintf("Error: %s", pg_ErrorMessage($db))) ;
+                };
+
+	pg_freeresult ($result);
+	pg_close($connection);
+	header("Location: index.php?msg=invalid");
+
+	exit;
+	}
+?>

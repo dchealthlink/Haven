@@ -1,0 +1,60 @@
+<?php
+/*
+This class will take the data which it is supplied with and then generate the linkbox for us. Essentially, a multi-part array is parsd to the linkbox. This means the array will consist of each piece of data, which is made up of two parts - the bit you want the user to see and the bit which is the actual URL. 
+*/
+class linkbox extends genericinfo {
+    /*
+         Set up the Object. You will notice, we have not reserved 
+        memory space for variables. In this circumstance it is not necessary.
+    */
+
+    /*
+        This is the constructor for the linkbox. The only thing this does 
+        is to call the constructor of the parent class. Why? Well, whilst 
+        PHP manages a certain part of OO, one of the bits it falls down on 
+        (at the moment) is constructors within sub-classes. So, to 
+        be sure that the sub-class is instantiated with the constructor of 
+        the parent class, I simply call the parent constructor. Of course, 
+        if I then wanted to override any of the values, I could easily do so.
+    */
+    function linkbox() {
+        $this->genericinfo();
+    }
+    /*
+        This is the only method within the class. Quite simply, as you can see 
+        it draws the table(s), placing the required data in the appropriate place.
+    */
+    function drawlinkbox() {
+
+        echo("<TABLE BORDER=\"$this->outerborderwidth\" CELLPADDING=\"0\" CELLSPACING=\"0\" WIDTH=\"$this->outerwidth\" BORDERCOLOR=\"$this->outerbordercolor\" BGCOLOR=\"$this->titlebgcolor\">");
+        echo("<TR>");
+        echo("<TD>");
+        if (isset($this->cssboxtitle)) {
+            echo("<DIV CLASS=\"" . $this->getcssboxtitle() . "\">");
+            echo($this->title);
+            echo("</DIV>");
+        } else {
+            echo($this->title);
+        }
+        echo("</TD>");
+        echo("</TR>");
+        echo("<TR>");
+        echo("<TD>");
+        echo("<TABLE BORDER=\"0\" CELLPADDING=\"0\" CELLSPACING=\"0\" WIDTH=\"$this->innerwidth\" BGCOLOR=\"$this->innerbgcolor\">");
+        echo("<TR>");
+        echo("<TD>");
+        echo("<UL>");
+        for ($x = 0; $x < count($this->data); $x++) {
+            echo("<LI><A HREF=\"" . $this->data[$x][1] . "\">" . $this->data[$x][0] . "</A></LI>");
+        }
+        echo("</UL>");
+        echo("</TD>");
+        echo("</TR>");
+        echo("</TABLE>");
+        echo("</TD>");
+        echo("</TR>");
+        echo("</TABLE>");
+    }
+}
+
+?>

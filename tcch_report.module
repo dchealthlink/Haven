@@ -1,0 +1,1501 @@
+<?php
+function tcch_report_menu() {
+  $items['cch_report/form'] = array(
+    'title' => t('CCH Report form'),
+    'page callback' => 'cch_report_form',
+    'access arguments' => array('access content'),
+    'description' => t('View Report Information'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['tcch_report/form'] = array(
+    'title' => t('CCH Report form'),
+    'page callback' => 'tcch_report_form',
+    'access arguments' => array('access content'),
+    'description' => t('View Report Information'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['test/form'] = array(
+    'title' => t('Dummy test form'),
+    'page callback' => 'test_form',
+    'access arguments' => array('access content'),
+    'description' => t('Test Information'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+function tcch_report_form() {
+  return drupal_get_form('tcch_report_run_form');
+}
+function test_form() {
+  return drupal_get_form('thisisatest_form');
+}
+
+
+function tcch_report_block($op = 'list', $delta = 0, $edit=array()) {
+	$fn = $_GET['fn'] ;
+
+	$fn = arg(1) ;
+	$fn2 = arg(2) ;
+	$fn3 = arg(3) ;
+//fnhere
+/*
+	global $user;
+
+        $usersql = "select u.uid, ct_cs.field_first_name1_value, ct_cs.field_last_name1_value, ct_cs.field_college1_value as college_id, u.rid, fv.form_id, fv.form_action, fv.role_id, fv.status, fv.useradmin, fv.active_status, fv.is_user, fv.is_owner 
+from users_all_roles u, form_validation fv, node n, content_type_cch_staff ct_cs 
+where u.rid = fv.role_id and u.uid = n.uid and
+(n.nid = ct_cs.nid and n.vid = ct_cs.vid) AND u.uid = ".$user->uid." AND fv.form_id = '".$fn."' ";
+
+        $userresult = db_query($usersql) ;
+
+        while($useritem = db_fetch_object($userresult)) {
+                $rolearray[] = $useritem->rid;
+                $actionarray[] = $useritem->form_action;
+        }
+*/
+	switch ($fn) {
+		case 'mn':
+			$formname = 'cch_report_menu_form' ;
+			$formsubject = 'Report Info';
+
+			switch($fn2) {
+				case 'cc':
+					$formname = 'tcch_report_run_form' ;
+					$formsubject = 'Report Info';
+				break;
+				case 'dm':
+					$formname = 'thisisatest_form' ;
+					$formsubject = 'Report Info';
+				break;
+				case 'xx':
+					$formname = 'newtest_form' ;
+					$formsubject = 'Report Info';
+				break;
+				case 'pdf':
+					variable_set('reportformat',$fn2);
+					variable_set('reportname',$fn3);
+				break;
+				case 'ddf':
+					variable_set('reportformat',$fn2);
+					variable_set('reportname',$fn3);
+				break;
+				default:
+					variable_set('reportname',$fn2);
+				break;
+			}
+
+		break;
+		case 'dm':
+			$formname = 'thisisatest_form' ;
+			$formname = 'newtest_form' ;
+			$formsubject = 'Report Info';
+		break;
+	}
+
+  switch ($op) {
+    case 'list':
+      return array(0 => array('info' => t('Report Block')));
+    
+    case 'view':
+      $subject = '';
+      $content = '';
+      $output = drupal_get_form($formname);
+      switch ($delta) {
+        case 0:
+          $content = theme('table', array('output' => $output));
+          $subject = t($formsubject);
+          break;
+      }
+      if ($subject || $content) {
+        return array('subject' => $subject, 'content' => $content);
+      }
+      break;  
+  }
+
+}
+
+
+function cch_report_form() {
+  return drupal_get_form('cch_report_menu_form');
+}
+
+
+
+// =========================================================================
+
+
+function cch_report_menu_form() {
+
+	global $user;
+        if (!$user->uid) {
+                drupal_set_message("Report Requests can only be made by Logged In Users - Please Log In");
+                drupal_goto('');
+        }
+	$uid = $_GET['uid'] ;
+	$reportname = variable_get('reportname',null);
+	$reportformat = variable_get('reportformat',null);
+	$ctmecolor = 'green';
+	$ctmscolor = 'green';
+
+	switch ($reportname) {
+		case 'CCH-accept_by_cip':
+		case 'CCH-accept_by_college':
+		case 'CCH-course_params':
+		case 'CCH-accept_by_soc':
+		case 'CCH-award_by_course':
+		case 'CCH-award_by_resource':
+		case 'CCH-award_by_resource_type':
+		case 'CCH-award_by_resource_subject':
+		case 'CCH-award_by_user':
+		case 'CCH-data_by_user':
+		case 'CCH-data_by_user_accept':
+		case 'CCH-data_by_user_award':
+		case 'CCH-guest_count':
+		case 'CCH-holder_count':
+		case 'CCH-holder_detail':
+		case 'CCH-req_by_branch':
+		case 'CCH-req_by_branch_plus':
+		case 'CCH-req_by_recipient':
+		case 'CCH-status_by_branch':
+		case 'CCH-status_by_pay_grade':
+		case 'CCH-status_by_service_status':
+		case 'CCH-survey_rollup':
+		case 'CCH-timing':
+		case 'CCH-timing_by_type':
+		case 'CCH-timing_date':
+		case 'CCH-top_accept':
+		case 'CCH-top_accept_course':
+		case 'CCH-top_award':
+		case 'CCH-top_award_course':
+		case 'CCH-trans_by_branch_recip':
+		case 'CCH-trans_by_recipient':
+		case 'CCH-trans_by_recipient_complete':
+		case 'CCH-trans_by_recipient_final':
+		case 'CCH-utilization':
+		case 'CCH-utilization_days':
+		case 'DF-user_profile':
+		case 'DF-survey_poll':
+		case 'DF-transcript_sent':
+		case 'DF-request_docs':
+		case 'DF-request_timing':
+
+		$sql = "SELECT param_type, param_id, param_value FROM tcch_reports_params where report_name = '".$reportname."' order by 1";
+//addhere
+        	$result = db_query($sql) ;
+        	while($rrow = db_fetch_object($result)) {
+				$test = $rrow->param_id  ;
+				$$test = $rrow->param_value ;
+		}
+		break;
+/*
+		case 'CCH-holder_detail':
+			$amcolor = 'green';
+			$axcolor = 'green';
+		break;
+*/
+// end here
+
+	}
+
+  	$form = array();
+
+        $sql = "SELECT uid, name, mail from users where uid = ".$user->uid ;
+
+        $result = db_query($sql);
+        $preitem = db_fetch_object($result) ;
+
+
+//        $prerows[] = array('Name:','<b>'.$preitem->name.'</b>') ;
+//        $prerows[] = array('Email:','<b>'.$preitem->mail.'</b>') ;
+	$cid = $preitem->college_id;
+
+// $form['#action'] = url('http://tcch.local/sites/all/modules/tcch_reports/rep_inc/CCH-course_params.php', array('external' => true));
+
+
+        $form['name'] = array(
+                '#type' => 'fieldset',
+                '#collapsible' => FALSE,
+                '#collapsed' => FALSE,
+        );
+/*
+  	$form['name']['table'] = array(
+      		'#value' => theme('table', $header, $prerows),
+  	);
+
+*/
+	$rtsql = "SELECT resource_type, resource_type_desc from resource_type order by sort_order ";
+        $rtresult = db_query($rtsql) ;
+	$rt_array[null] = null;
+	$st_array = "<option></option>";
+        while($rrow = db_fetch_object($rtresult)) {
+        	$rt_array[$rrow->resource_type] = $rrow->resource_type_desc ;
+		$st_array.="<option value='".$rrow->resource_type."'>".$rrow->resource_type_desc."</option>";
+	}
+	$retsql = "SELECT distinct request_type from tcch_request order by 1 ";
+        $retresult = db_query($retsql) ;
+	$ret_array[null] = null;
+	$rt_array = "<option></option>";
+        while($rerow = db_fetch_object($retresult)) {
+        	$ret_array[$rerow->request_type] = $rerow->request_type ;
+		$rt_array.="<option value='".$rerow->request_type."'>".$rerow->request_type."</option>";
+	}
+	$collegesql = "SELECT college_id, college_name from part_college order by sort_order ";
+        $collegeresult = db_query($collegesql) ;
+	$college_array[null] = null;
+	$co_array = "<option></option>";
+        while($crow = db_fetch_object($collegeresult)) {
+        	$college_array[$crow->college_id] = $crow->college_name ;
+		$co_array .="<option value='".$crow->college_id."'>".$crow->college_name."</option>";
+	}
+	$sbsql = "SELECT service_branch, service_branch_name from service_branch where exclude_report = 'N' order by sort_order ";
+        $sbresult = db_query($sbsql) ;
+	$service_select = "<option></option>";
+	$sb_array[null] = null;
+        while($srow = db_fetch_object($sbresult)) {
+        	$sb_array[$srow->service_branch] = $srow->service_branch_name ;
+		$service_select.= "<option value='".$srow->service_branch."'>".$srow->service_branch_name."</option>";
+	}
+	$sssql = "SELECT status_cd, status_desc from service_status order by sort_order ";
+        $ssresult = db_query($sssql) ;
+	$ss_array[null] = null;
+	$status_select = "<option></option>";
+        while($xrow = db_fetch_object($ssresult)) {
+        	$ss_array[$xrow->status_cd] = $xrow->status_desc ;
+		$status_select.= "<option value='".$xrow->status_cd."'>".$xrow->status_desc."</option>";
+	}
+	$ctsql = "SELECT distinct course_type from tcch_course order by 1 ";
+        $ctresult = db_query($ctsql) ;
+	$ct_array = "<option></option>";
+        while($ctrow = db_fetch_object($ctresult)) {
+		$ct_array.="<option value='".$ctrow->course_type."'>".$ctrow->course_type."</option>";
+	}
+
+                $dobmonth_select = "<option></option>".
+                        "<option value='01'>Jan</option>".
+                        "<option value='02'>Feb</option>".
+                        "<option value='03'>Mar</option>".
+                        "<option value='04'>Apr</option>".
+                        "<option value='05'>May</option>".
+                        "<option value='06'>Jun</option>".
+                        "<option value='07'>Jul</option>".
+                        "<option value='08'>Aug</option>".
+                        "<option value='09'>Sep</option>".
+                        "<option value='10'>Oct</option>".
+                        "<option value='11'>Nov</option>".
+                        "<option value='12'>Dec</option>"
+                        ;
+              $dobday_select = "<option></option>";
+              for ($i = 1; $i <= 31; $i++) {
+                      $theday = str_pad($i,2,'0', STR_PAD_LEFT) ;
+//                      $yr_array[$theyear] = $theyear;
+                        $dobday_select.="<option value=".$theday.">".$theday."</option>";
+              }
+                $yr_array = array();
+                $dobyr_select = "<option></option>";
+                for ($i = 0; $i <= 5; $i++) {
+                        $theyear = strval(date("Y") - $i) ;
+                        $dobyr_select.="<option value=".$theyear.">".$theyear."</option>";
+                }
+
+
+	$feesql = "SELECT report_id, report_name, report_location, report_output, report_list from tcch_reports ";
+	if ($reportformat) {
+		$feesql.= " WHERE report_format = '".$reportformat."' ";
+	}
+	$feesql.= " ORDER BY report_list, sort_order ";
+
+        $feeresult = db_query($feesql) ;
+        $feerows = array();
+        switch ($feeresult->num_rows) {
+        	case 0:
+                $feeheader = array('','','','','','','','');
+                break;
+                default:
+                $feeheader = array('Report ID','Report Name','Report Output');
+                $fee_count = 0;
+		$rep_select = "<option></option>";
+                while($row = db_fetch_object($feeresult)) {
+			$editlink = "<a href='sites/all/modules/tcch_reports/rep_inc/".$row->report_location."' target='_blank'>".$row->report_id."</a>" ; 
+//			$edit2link = "<a href='CCH-course.php'>".$row->report_id."</a>" ; 
+//			$editlink = "<a href='?q=reports/mn/cc'>".$row->report_id."</a>" ; 
+//			$editlink = "<a href='?q=college_payment_send/form&pno=".$row->report_id."' rel='lightframe[|width:900px; height:500px; scrolling:auto;][Edit Order]'>".$row->report_id."</a>" ; 
+                        $feerows [] = array( $editlink,
+    			$row->report_name, $row->report_output);
+                        $allreports_array[$row->report_name] = $row->report_name ;
+			if ($row->report_name == $reportname) {
+				$rep_select.="<option selected value=".$row->report_name.">".$row->report_list."</option>";
+			} else {
+				$rep_select.="<option value=".$row->report_name.">".$row->report_list."</option>";
+			}
+                        $fee_count = $fee_count + 1;
+                }
+
+         }
+			$format_select = "<option selected></option>" ;
+			switch ($reportformat) {
+				case 'pdf':
+					$format_select.="<option selected value=pdf>pdf - Adobe portable document format</option>";
+					$format_select.="<option value=ddf>ddf - Data delimited file {|}</option>";
+				break;
+				case 'ddf':
+					$format_select.="<option value=pdf>pdf - Adobe portable document format</option>";
+					$format_select.="<option selected value=ddf>ddf - Data delimited file {|}</option>";
+				break;
+
+				default:
+					$format_select.="<option value=pdf>pdf - Adobe portable document format</option>";
+					$format_select.="<option value=ddf>ddf - Data delimited file {|}</option>";
+				break;
+
+			}
+//------------------------------------------------ new stuff -----------------------------
+
+        $prerows [] = array( array("data"=>"<b>Format Type:</b>","colspan"=>2),array("data"=>"<select name='selected_format' onChange=\"javascript:window.location.href='?q=reports/mn/'+this.value; return false;\" >".$format_select."</select>","colspan"=>4,"attributes"=> array("align"=>"left")));
+        $prerows [] = array( array("data"=>"<b>Available Reports:</b>","colspan"=>2),array("data"=>"<select name='selected_report' onChange=\"javascript:window.location.href='?q=reports/mn/'+this.value; return false;\" >".$rep_select."</select>","colspan"=>4,"attributes"=> array("align"=>"left")));
+        $prerows [] = array( '<font color='.$fncolor.'>First Name</font>',array('data'=>'<input '.$fndisabled.' type="text" name="first_name" size="15" align="left" />','attributes'=> array('align'=>'left')),'<font color='.$lncolor.'>Last Name</font>','<input type="text" '.$lndisabled.' name="last_name" size="20"','&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;','&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;');
+        $prerows [] = array( '<font color='.$ckcolor.'>Course Key</font>',array('data'=>'<input type="text" '.$ckdisabled.' name="ind_course_key" size="15" align="left" />','attributes'=> array('align'=>'left')),'<font color='.$ricolor.'>Request ID</font>','<input type="text" '.$ridisabled.' name="tcch_request_id" size="20"','<font color='.$ctcolor.'>Course Type</font>','<select '.$ckdisabled.' name="course_type">'.$ct_array.'</select>');
+        $prerows [] = array( '<font color='.$rkcolor.'>Resource Key</font>',array('data'=>'<input type="text" '.$rkdisabled.' name="resource_key" size="15" align="left" />','attributes'=> array('align'=>'left')),
+'<font color='.$rtcolor.'>Request Type</font>','<select '.$rtdisabled.' name="request_type">'.$rt_array.'</select>','<font color='.$stcolor.'>Resource Type</font>','<select '.$stdisabled.' name="resource_type">'.$st_array.'</select>');
+        $prerows [] = array( '<font color='.$ctmscolor.'>Start Date</font>','<select name="start_month">'.$dobmonth_select.'</select>&nbsp;<select name="start_day">'.$dobday_select.'</select>&nbsp;<select name="start_year">'.$dobyr_select.'</select> ','<font color='.$ctmecolor.'>End Date</font>','<select name="end_month">'.$dobmonth_select.'</select>&nbsp;<select name="end_day">'.$dobday_select.'</select>&nbsp;<select name="end_year">'.$dobyr_select.'</select>');
+        $prerows [] = array( '<font color='.$sbcolor.'>Service Branch</font>','<select '.$sbdisabled.' name="service_branch_pri">'.$service_select.'</select>','<font color='.$pgcolor.'>Pay Grade</font>','<input type="text" '.$pgdisabled.' name="pay_grade" size="10">','','');
+        $prerows [] = array( array('data'=>'<font color='.$sscolor.'>Status</font>','colspan' => 1),array('data'=>'<select '.$ssdisabled.' name="status_pri">'.$status_select.'</select>','colspan'=>2));
+        $prerows [] = array( array('data'=>'<font color='.$cicolor.'>College</font>','colspan' => 1),array('data'=>'<select '.$cidisabled.' name="college_id">'.$co_array.'</select>','colspan'=>3),'<font color='.$dfcolor.'>Download File</font>',array('data'=>'<input '.$dfdisabled.' type="text" name="download_file_name" size="15" align="left" />','attributes'=> array('align'=>'left')));
+
+
+  $form['prename']['pretable'] = array(
+      '#value' => theme('table', $preheader, $prerows),
+  );
+
+  $form['prename']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+  );
+  $form['prename']['clear'] = array(
+    '#type' => 'submit',
+    '#value' => 'Clear',
+//    '#validate' => array('search_cch_account_form_clear'),
+  );
+
+
+//------------------------------------------------ end new stuff -------------------------
+/*
+                                $form['name']['request_frame'] = array(
+                                '#type' => 'fieldset',
+                                '#title' => t('Available Reports:'),
+                                '#collapsible' => FALSE,
+                                '#collapsed' => FALSE,
+                                );
+                                $form['name']['request_frame']['request_table'] = array(
+                                '#value' => theme('table', $feeheader, $feerows),
+                                );
+
+
+
+                                $form['name']['request_frame'] = array(
+                                '#type' => 'fieldset',
+                                '#title' => t('Available Reports:'),
+                                '#collapsible' => FALSE,
+                                '#collapsed' => FALSE,
+                                );
+
+                                $form['name']['request_frame']['request_table'] = array(
+                                '#value' => theme('table', $feeheader, $feerows),
+                                );
+
+
+                                $form['name']['request_frame']['ind_course_key'] = array(
+                                '#title' => t('Course Key'),
+                                '#type' => 'textfield',
+                                '#default_value' => '' 
+                                ,
+                                );
+                                $form['name']['request_frame']['resource_key'] = array(
+                                '#title' => t('Resource Key'),
+                                '#type' => 'textfield',
+                                '#default_value' => '' 
+                                ,
+                                );
+                                $form['name']['request_frame']['resource_type'] = array(
+                                '#title' => t('Resource Type'),
+                                '#type' => 'select',
+                                '#options' => $rt_array
+                                ,
+                                );
+                                $form['name']['request_frame']['request_id'] = array(
+                                '#title' => t('Request ID'),
+                                '#type' => 'textfield',
+                                '#default_value' => '' 
+                                ,
+                                );
+                                $form['name']['request_frame']['request_type'] = array(
+                                '#title' => t('Request Type'),
+                                '#type' => 'select',
+                                '#options' => $ret_array
+                                ,
+                                );
+                                $form['name']['request_frame']['course_type'] = array(
+                                '#title' => t('Course Type'),
+                                '#type' => 'textfield',
+                                '#default_value' => '' 
+                                ,
+                                );
+                                $form['name']['request_frame']['semester_hours'] = array(
+                                '#title' => t('Semester Hours'),
+                                '#type' => 'textfield',
+                                '#default_value' => '' 
+                                ,
+                                );
+
+// ----- dates ---------
+                $form['name']['request_frame']['start_date'] = array(
+                        '#prefix' => '<div id=date-set>',
+                        '#title' => t('Start Date'),
+                        '#type' => 'fieldset',
+                        '#suffix' => '</div>',
+                );
+                $form['name']['request_frame']['start_date']['start_month'] = array(
+                        '#title' => 'Month',
+                        '#type' => 'select',
+                        '#options' => array(
+                                null => null,
+                                '01' => t('Jan'),
+                                '02' => t('Feb'),
+                                '03' => t('Mar'),
+                                '04' => t('Apr'),
+                                '05' => t('May'),
+                                '06' => t('Jun'),
+                                '07' => t('Jul'),
+                                '08' => t('Aug'),
+                                '09' => t('Sep'),
+                                '10' => t('Oct'),
+                                '11' => t('Nov'),
+                                '12' => t('Dec'),
+                        ),
+                );
+                $form['name']['request_frame']['start_date']['start_day'] = array(
+                        '#title' => 'Day',
+                        '#type' => 'select',
+                        '#options' => array(
+                                null => null,
+                                '01' => '01',
+                                '02' => '02',
+                                '03' => '03',
+                                '04' => '04',
+                                '05' => '05',
+                                '06' => '06',
+                                '07' => '07',
+                                '08' => '08',
+                                '09' => '09',
+                                '10' => '10',
+                                '11' => '11',
+                                '12' => '12',
+                                '13' => '13',
+                                '14' => '14',
+                                '15' => '15',
+                                '16' => '16',
+                                '17' => '17',
+                                '18' => '18',
+                                '19' => '19',
+                                '20' => '20',
+                                '21' => '21',
+                                '22' => '22',
+                                '23' => '23',
+                                '24' => '24',
+                                '25' => '25',
+                                '26' => '26',
+                                '27' => '27',
+                                '28' => '28',
+                                '29' => '29',
+                                '30' => '30',
+                                '31' => '31',
+                        ),
+                );
+                $yr_array = array();
+                $yr_array[null] = null;
+                for ($i = 0; $i <= 5; $i++) {
+                        $theyear = strval(date("Y") - $i) ;
+                        $yr_array[$theyear] = $theyear;
+                }
+                $form['name']['request_frame']['start_date']['start_year'] = array(
+                        '#title' => 'Year',
+                        '#type' => 'select',
+                        '#options' => $yr_array,
+                );
+
+
+
+
+                $form['name']['request_frame']['end_date'] = array(
+                        '#prefix' => '<div id=date-set>',
+                        '#title' => t('End Date'),
+                        '#type' => 'fieldset',
+                        '#suffix' => '</div>',
+                );
+                $form['name']['request_frame']['end_date']['end_month'] = array(
+                        '#title' => 'Month',
+                        '#type' => 'select',
+                        '#options' => array(
+                                null => null,
+                                '01' => t('Jan'),
+                                '02' => t('Feb'),
+                                '03' => t('Mar'),
+                                '04' => t('Apr'),
+                                '05' => t('May'),
+                                '06' => t('Jun'),
+                                '07' => t('Jul'),
+                                '08' => t('Aug'),
+                                '09' => t('Sep'),
+                                '10' => t('Oct'),
+                                '11' => t('Nov'),
+                                '12' => t('Dec'),
+                        ),
+                );
+
+                $form['name']['request_frame']['end_date']['end_day'] = array(
+                        '#title' => 'Day',
+                        '#type' => 'select',
+                        '#options' => array(
+                                null => null,
+                                '01' => '01',
+                                '02' => '02',
+                                '03' => '03',
+                                '04' => '04',
+                                '05' => '05',
+                                '06' => '06',
+                                '07' => '07',
+                                '08' => '08',
+                                '09' => '09',
+                                '10' => '10',
+                                '11' => '11',
+                                '12' => '12',
+                                '13' => '13',
+                                '14' => '14',
+                                '15' => '15',
+                                '16' => '16',
+                                '17' => '17',
+                                '18' => '18',
+                                '19' => '19',
+                                '20' => '20',
+                                '21' => '21',
+                                '22' => '22',
+                                '23' => '23',
+                                '24' => '24',
+                                '25' => '25',
+                                '26' => '26',
+                                '27' => '27',
+                                '28' => '28',
+                                '29' => '29',
+                                '30' => '30',
+                                '31' => '31',
+                        ),
+                );
+                $form['name']['request_frame']['end_date']['end_year'] = array(
+                        '#title' => 'Year',
+                        '#type' => 'select',
+                        '#options' => $yr_array,
+                );
+
+
+
+// ----- end dates --------
+
+                                $form['name']['request_frame']['college_id'] = array(
+                                '#title' => t('Participating College'),
+                                '#type' => 'select',
+                                '#options' => $college_array
+                                ,
+                                );
+                                $form['name']['request_frame']['status_pri'] = array(
+                                '#title' => t('Service Status'),
+                                '#type' => 'select',
+                                '#options' => $ss_array
+                                ,
+                                );
+                                $form['name']['request_frame']['service_branch_pri'] = array(
+                                '#title' => t('Service Branch'),
+                                '#type' => 'select',
+                                '#options' => $sb_array
+                                ,
+                                );
+
+
+
+  $form['name']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+  );
+  $form['name']['clear'] = array(
+    '#type' => 'submit',
+    '#value' => 'Clear',
+  );
+
+
+*/
+
+  return $form;
+
+}
+
+function cch_report_menu_form_submit($form, &$form_state) {
+
+	if (!($_POST['selected_report'])) { 
+		drupal_set_message('No Report Selected') ;
+		drupal_goto('reports/mn');
+	}
+	if (!($_POST['selected_format'])) { 
+		drupal_set_message('No Format Type Selected') ;
+		drupal_goto('reports/mn');
+	} else {
+		if ($_POST['selected_format'] == 'ddf' AND !$_POST['download_file_name']) {
+			drupal_set_message('A Download File Name Must be Specified') ;
+			drupal_goto('reports/mn');
+		}
+	}
+
+
+        if ($form_state['clicked_button']['#id'] == 'edit-clear') {
+		drupal_goto('reports/mn');
+	}
+        if ($form_state['clicked_button']['#id'] == 'edit-delete') {
+
+
+        	for($i = 0; $i < count($_POST['checkboxes'])  ; $i++) {
+                	if ($_POST['checkboxes'][$i][0] ) {
+				$delsql = "DELETE FROM part_college_payment WHERE college_id = '".$_POST['checkboxes'][$i][1]."' AND payment_no = '".$_POST['checkboxes'][$i][2]."'";
+        			$delresult = db_query($delsql) ;
+               		}
+       		}
+
+		drupal_goto('collegedues/cp');
+
+	}
+        if ($form_state['clicked_button']['#id'] == 'edit-submit') {
+
+
+//		drupal_set_message(print_r($_POST,true));
+
+		$_SESSION['parameter1'] = $_POST['param1'];
+		$_SESSION['parameter2'] = $_POST['param2'];
+		$_SESSION['report_name'] = $_POST['selected_report'] ;
+
+                $searchcriteria='?rn='.$_SESSION['report_name'];
+
+
+//		drupal_set_message('---------------------DIVIDER-----------------');
+//		drupal_set_message(print_r($_SESSION,true));
+
+	}
+
+		global $base_url; 
+		$prefld = '&';
+//		drupal_set_message ('============================>>>>>  '.$base_url.'   ----  '. $_SERVER['DOCUMENT_ROOT'] );
+		if ($_POST['ind_course_key']) {
+			$searchcriteria.=$prefld.'ck='.$_POST['ind_course_key'];
+			if ($prefld == '?') {
+				$prefld = '&';
+			}
+		}
+		if ($_POST['semester_hours']) {
+			$searchcriteria.=$prefld.'sh='.$_POST['semester_hours'];
+			if ($prefld == '?') {
+				$prefld = '&';
+			}
+		}
+		if ($_POST['resource_key']) {
+			$searchcriteria.=$prefld.'rk='.$_POST['resource_key'];
+			if ($prefld == '?') {
+				$prefld = '&';
+			}
+		}
+		if ($_POST['request_type']) {
+			$searchcriteria.=$prefld.'rt='.$_POST['request_type'];
+			if ($prefld == '?') {
+				$prefld = '&';
+			}
+		}
+		if ($_POST['resource_type']) {
+			$searchcriteria.=$prefld.'st='.$_POST['resource_type'];
+			if ($prefld == '?') {
+				$prefld = '&';
+			}
+		}
+		if ($_POST['course_type']) {
+			$searchcriteria.=$prefld.'ct='.$_POST['course_type'];
+			if ($prefld == '?') {
+				$prefld = '&';
+			}
+		}
+		if ($_POST['pay_grade']) {
+			$searchcriteria.=$prefld.'pg='.$_POST['pay_grade'];
+			if ($prefld == '?') {
+				$prefld = '&';
+			}
+		}
+
+
+
+		if ($_POST['status_pri']) {
+			$searchcriteria.=$prefld.'ss='.$_POST['status_pri'];
+			if ($prefld == '?') {
+				$prefld = '&';
+			}
+		}
+		if ($_POST['service_branch_pri']) {
+			$searchcriteria.=$prefld.'sb='.$_POST['service_branch_pri'];
+			if ($prefld == '?') {
+				$prefld = '&';
+			}
+		}
+		if ($_POST['college_id']) {
+			$searchcriteria.=$prefld.'ci='.$_POST['college_id'];
+			if ($prefld == '?') {
+				$prefld = '&';
+			}
+		}
+                if ($_POST['start_year'] AND $_POST['start_month'] AND $_POST['start_day'] ) {
+                        $start_date = $_POST['start_year'].'-'.$_POST['start_month'].'-'.$_POST['start_day'];
+			$searchcriteria.=$prefld.'ctms='.$start_date;
+			if ($prefld == '?') {
+				$prefld = '&';
+			}
+			
+                }
+                if ($_POST['end_year'] AND $_POST['end_month'] AND $_POST['end_day'] ) {
+                        $end_date = $_POST['end_year'].'-'.$_POST['end_month'].'-'.$_POST['end_day'];
+			$searchcriteria.=$prefld.'ctme='.$end_date;
+			if ($prefld == '?') {
+				$prefld = '&';
+			}
+                }
+                if ($_POST['first_name']) {
+                       $searchcriteria.='&fn='.$_POST['first_name'];
+              }
+              if ($_POST['last_name']) {
+                      $searchcriteria.='&ln='.$_POST['last_name'];
+              }
+
+// -------------------------------- start ----------------------------------------
+if ($_POST['selected_format'] == 'ddf') {
+		$outputfilename= $_POST['download_file_name'];
+              if ($outputfilename) {
+
+                  $outfile = fopen("/tmp/".$outputfilename.".txt","w") ;
+                  $fulloutname = $outputfilename.".txt";
+		  variable_set('download_file_name',$fulloutname);
+              }
+
+              $rownum = 0;
+
+		switch ($_POST['selected_report']) { 
+
+			case 'DF-user_profile' :
+	
+              $sql = "SELECT uid, name, mail, user_type, pay_grade, first_name, last_name, substr(dob,1,10) as dob, phone_number, current_state, residence_state, active_status, service_branch, mos1, ssn_last4, org_name, substr(created_datetime,1,10) as created_datetime, field_purpose_value FROM user_profile WHERE 
+('".$_POST['pay_grade']."' = '' OR pay_grade = '".$_POST['pay_grade']."') AND
+('".$_POST['service_branch']."' = '' OR service_branch = '".$_POST['service_branch']."') AND
+('".$_POST['last_name']."' = '' OR last_name LIKE '".$_POST['last_name']."%') AND
+('".$_POST['first_name']."' = '' OR first_name LIKE '".$_POST['first_name']."%') AND
+created_datetime between if ('".$start_date."' = '', '2012-01-01', '".$start_date."') and  if ('".$end_date."' = '', '2099-01-01', '".$end_date."') ORDER BY uid" ;
+
+              $result = db_query($sql);
+              $numrows = db_affected_rows($result);
+
+                        $outline.= 'uid|';
+                        $outline.= 'name|';
+                        $outline.= 'mail|';
+                        $outline.= 'user_type|';
+                        $outline.= 'pay_grade|';
+                        $outline.= 'first_name|';
+                        $outline.= 'last_name|';
+                        $outline.= 'mid_init|';
+                        $outline.= 'dob|';
+                        $outline.= 'phone_number|';
+                        $outline.= 'current_state|';
+                        $outline.= 'residence_state|';
+                        $outline.= 'active_status|';
+                        $outline.= 'service_branch|';
+                        $outline.= 'mos1|';
+                        $outline.= 'ssn_last4|';
+                        $outline.= 'org_name|';
+                        $outline.= 'created_datetime|';
+                        $outline.= 'field_purpose_value|';
+                          fputs($outfile, $outline."\r\n");
+                          $outline="";
+
+              while($rrow = db_fetch_object($result)) {
+
+//                   for ($i=0;$i<$numfields;$i++) {
+//                        $outline.= (mysql_field_name($result,$i))."|";
+                        $outline.= ($rrow->uid)."|";
+                        $outline.= ($rrow->name)."|";
+                        $outline.= ($rrow->mail)."|";
+                        $outline.= ($rrow->user_type)."|";
+                        $outline.= ($rrow->pay_grade)."|";
+                        $outline.= ($rrow->first_name)."|";
+                        $outline.= ($rrow->last_name)."|";
+                        $outline.= ($rrow->mid_init)."|";
+                        $outline.= ($rrow->dob)."|";
+                        $outline.= ($rrow->phone_number)."|";
+                        $outline.= ($rrow->current_state)."|";
+                        $outline.= ($rrow->residence_state)."|";
+                        $outline.= ($rrow->active_status)."|";
+                        $outline.= ($rrow->service_branch)."|";
+                        $outline.= ($rrow->mos1)."|";
+                        $outline.= ($rrow->ssn_last4)."|";
+                        $outline.= ($rrow->org_name)."|";
+                        $outline.= ($rrow->created_datetime)."|";
+                        $outline.= ($rrow->field_purpose_value)."|";
+//                   }
+
+                   if ($outputfilename) {
+                          fputs($outfile, $outline."\r\n");
+                          $outline="";
+                   }
+
+              }
+		break;
+		case 'DF-transcript_sent':
+			$sql = "select tcch_request_send.tcch_request_id,
+tcch_request.last_name,
+tcch_request.first_name,
+tcch_request_send.send_no ,
+tcch_request_send.eval_request_id ,
+tcch_request_send.recipient_type ,
+tcch_request_send.college_id ,
+part_college.college_name,
+tcch_request_send.delivery_cd ,
+delivery_method.delivery_method,
+delivery_method.pay_amount,
+delivery_method.product_id,
+tcch_request_send.request_date ,
+tcch_request_send.send_to ,
+tcch_request_send.send_attn ,
+tcch_request_send.send_address ,
+tcch_request_send.send_city ,
+tcch_request_send.send_state_cd ,
+tcch_request_send.send_zip_code ,
+tcch_request_send.send_fax_number ,
+tcch_request_send.sent_flag ,
+tcch_request_send.sent_date ,
+tcch_request_send.sent_user_id ,
+tcch_request_send.order_id ,
+tcch_request_send.order_date 
+from tcch_request_send, tcch_request, part_college, delivery_method
+where tcch_request_send.tcch_request_id = tcch_request.tcch_request_id 
+AND   tcch_request_send.college_id = part_college.college_id
+AND   tcch_request.request_type = 'TRANSCRIPT' 
+AND   tcch_request_send.delivery_cd = delivery_method.delivery_cd AND
+('".$_POST['pay_grade']."' = '' OR tcch_request.pay_grade LIKE '".$_POST['pay_grade']."%') AND
+('".$_POST['service_branch_pri']."' = '' OR tcch_request.service_branch_pri LIKE '".$_POST['service_branch_pri']."%') AND
+('".$_POST['tcch_request_id']."' = '' OR tcch_request.tcch_request_id LIKE '".$_POST['tcch_request_id']."%') AND
+('".$_POST['status_pri']."' = '' OR tcch_request.status_pri LIKE '".$_POST['status_pri']."%') AND
+('".$_POST['college_id']."' = '' OR tcch_request_send.college_id LIKE '".$_POST['college_id']."%') AND
+('".$_POST['last_name']."' = '' OR tcch_request.last_name LIKE '".$_POST['last_name']."%') AND
+('".$_POST['first_name']."' = '' OR tcch_request.first_name LIKE '".$_POST['first_name']."%') AND
+tcch_request.request_date between if ('".$start_date."' = '', '2012-01-01', '".$start_date."') and  if ('".$end_date."' = '', '2099-01-01', '".$end_date."') 
+order by 1, 4 ; ";
+              		$result = db_query($sql);
+              		$numrows = db_affected_rows($result);
+
+                        $outline.= 'tcch_request_id|';
+                        $outline.= 'last_name|';
+                        $outline.= 'first_name|';
+                        $outline.= 'send_no|';
+                        $outline.= 'eval_request_id|';
+                        $outline.= 'recipient_type|';
+                        $outline.= 'college_id|';
+                        $outline.= 'college_name|';
+                        $outline.= 'delivery_cd|';
+                        $outline.= 'delivery_method|';
+                        $outline.= 'pay_amount|';
+                        $outline.= 'product_id|';
+                        $outline.= 'request_date|';
+                        $outline.= 'send_to|';
+                        $outline.= 'send_attn|';
+                        $outline.= 'send_address|';
+                        $outline.= 'send_city|';
+                        $outline.= 'send_state_cd|';
+                        $outline.= 'send_zip_code|';
+                        $outline.= 'send_fax_number|';
+                        $outline.= 'sent_flag|';
+                        $outline.= 'sent_date|';
+                        $outline.= 'sent_user_id|';
+                        $outline.= 'order_id|';
+                        $outline.= 'order_date|';
+                        fputs($outfile, $outline."\r\n");
+                        $outline="";
+
+              		while($rrow = db_fetch_object($result)) {
+
+                        	$outline.= ($rrow->tcch_request_id)."|";
+                        	$outline.= ($rrow->last_name)."|";
+                        	$outline.= ($rrow->first_name)."|";
+                        	$outline.= ($rrow->send_no)."|";
+                        	$outline.= ($rrow->eval_request_id)."|";
+                        	$outline.= ($rrow->recipient_type)."|";
+                        	$outline.= ($rrow->college_id)."|";
+                        	$outline.= ($rrow->college_name)."|";
+                        	$outline.= ($rrow->delivery_cd)."|";
+                        	$outline.= ($rrow->delivery_method)."|";
+                        	$outline.= ($rrow->pay_amount)."|";
+                        	$outline.= ($rrow->product_id)."|";
+                        	$outline.= ($rrow->request_date)."|";
+                        	$outline.= ($rrow->send_to)."|";
+                        	$outline.= ($rrow->send_attn)."|";
+                        	$outline.= ($rrow->send_address)."|";
+                        	$outline.= ($rrow->send_city)."|";
+                        	$outline.= ($rrow->send_state_cd)."|";
+                        	$outline.= ($rrow->send_zip_code)."|";
+                        	$outline.= ($rrow->send_fax_number)."|";
+                        	$outline.= ($rrow->sent_flag)."|";
+                        	$outline.= ($rrow->sent_date)."|";
+                        	$outline.= ($rrow->sent_user_id)."|";
+                        	$outline.= ($rrow->order_id)."|";
+                        	$outline.= ($rrow->order_date)."|";
+
+                   		if ($outputfilename) {
+                          		fputs($outfile, $outline."\r\n");
+                          		$outline="";
+                   		}
+
+              		}
+		break;
+		case 'DF-request_docs':
+			$sql = "select tcch_request.tcch_request_id,
+tcch_request.last_name,
+tcch_request.first_name,
+tcch_request_doc.document_id  ,
+tcch_request_doc.document_name  ,
+tcch_request_doc.file_name  ,
+tcch_request_doc.document_type  ,
+tcch_request_doc.status_datetime  ,
+tcch_request_doc.document_owner  ,
+tcch_request_doc.received_date  
+FROM tcch_request , tcch_request_doc
+WHERE tcch_request.tcch_request_id = tcch_request_doc.request_id AND
+tcch_request.request_type like 'EVAL%' AND
+('".$_POST['pay_grade']."' = '' OR tcch_request.pay_grade LIKE '".$_POST['pay_grade']."%') AND
+('".$_POST['service_branch_pri']."' = '' OR tcch_request.service_branch_pri LIKE '".$_POST['service_branch_pri']."%') AND
+('".$_POST['tcch_request_id']."' = '' OR tcch_request.tcch_request_id LIKE '".$_POST['tcch_request_id']."%') AND
+('".$_POST['status_pri']."' = '' OR tcch_request.status_pri LIKE '".$_POST['status_pri']."%') AND
+('".$_POST['last_name']."' = '' OR tcch_request.last_name LIKE '".$_POST['last_name']."%') AND
+('".$_POST['first_name']."' = '' OR tcch_request.first_name LIKE '".$_POST['first_name']."%') AND
+tcch_request.request_date between if ('".$start_date."' = '', '2012-01-01', '".$start_date."') and  if ('".$end_date."' = '', '2099-01-01', '".$end_date."') 
+order by 1, 4 ; ";
+              		$result = db_query($sql);
+              		$numrows = db_affected_rows($result);
+
+                        $outline.= 'tcch_request_id|';
+                        $outline.= 'last_name|';
+                        $outline.= 'first_name|';
+                        $outline.= 'document_id|';
+                        $outline.= 'document_name|';
+                        $outline.= 'file_name|';
+                        $outline.= 'document_type|';
+                        $outline.= 'status_datetime|';
+                        $outline.= 'document_owner|';
+                        $outline.= 'received_date|';
+                        fputs($outfile, $outline."\r\n");
+                        $outline="";
+
+              		while($rrow = db_fetch_object($result)) {
+
+                        	$outline.= ($rrow->tcch_request_id)."|";
+                        	$outline.= ($rrow->last_name)."|";
+                        	$outline.= ($rrow->first_name)."|";
+                        	$outline.= ($rrow->document_id)."|";
+                        	$outline.= ($rrow->document_name)."|";
+                        	$outline.= ($rrow->file_name)."|";
+                        	$outline.= ($rrow->document_type)."|";
+                        	$outline.= ($rrow->status_datetime)."|";
+                        	$outline.= ($rrow->document_owner)."|";
+                        	$outline.= ($rrow->received_date)."|";
+
+                   		if ($outputfilename) {
+                          		fputs($outfile, $outline."\r\n");
+                          		$outline="";
+                   		}
+
+              		}
+		break;
+		case 'DF-request_timing':
+			$sql = "SELECT tcch_request.tcch_request_id  ,
+tcch_request.tcch_user_id  ,
+tcch_request.last_name  ,
+tcch_request.first_name  ,
+tcch_request.mid_init  ,
+tcch_request.other_names  ,
+tcch_request.owner_user_id  ,
+tcch_request.request_type  ,
+tcch_request.request_date  ,
+tcch_request.status  ,
+tcch_request.ssn_last4  ,
+tcch_request.pay_grade  ,
+tcch_request.service_branch_pri  ,
+tcch_request.status_pri  ,
+tcch_request.date_of_birth  ,
+tcch_request.address  ,
+tcch_request.city  ,
+tcch_request.state_cd  ,
+tcch_request.zip_code  ,
+tcch_request.tx_address  ,
+tcch_request.tx_city  ,
+tcch_request.tx_state_cd  ,
+tcch_request.tx_zip_code  ,
+tcch_request.phone_number  ,
+tcch_request.email  ,
+tcch_request.eval_request_id  ,
+tcch_request.active_status  ,
+tcch_request_timing.create_datetime,
+tcch_request_timing.submit_datetime,
+tcch_request_timing.process_datetime,
+tcch_request_timing.complete_datetime,
+tcch_request_timing.final_datetime,
+tcch_request_timing.cancel_datetime,
+tcch_request_timing.retire_datetime,
+tcch_request_timing.last_doc_datetime
+FROM tcch_request, tcch_request_timing
+WHERE tcch_request.tcch_request_id = tcch_request_timing.tcch_request_id AND
+('".$_POST['pay_grade']."' = '' OR tcch_request.pay_grade LIKE '".$_POST['pay_grade']."%') AND
+('".$_POST['service_branch_pri']."' = '' OR tcch_request.service_branch_pri LIKE '".$_POST['service_branch_pri']."%') AND
+('".$_POST['tcch_request_id']."' = '' OR tcch_request.tcch_request_id LIKE '".$_POST['tcch_request_id']."%') AND
+('".$_POST['request_type']."' = '' OR tcch_request.request_type LIKE '".$_POST['request_type']."%') AND
+('".$_POST['status_pri']."' = '' OR tcch_request.status_pri LIKE '".$_POST['status_pri']."%') AND
+('".$_POST['last_name']."' = '' OR tcch_request.last_name LIKE '".$_POST['last_name']."%') AND
+('".$_POST['first_name']."' = '' OR tcch_request.first_name LIKE '".$_POST['first_name']."%') AND
+tcch_request.request_date between if ('".$start_date."' = '', '2012-01-01', '".$start_date."') and  if ('".$end_date."' = '', '2099-01-01', '".$end_date."') 
+ORDER BY 1";
+              		$result = db_query($sql);
+              		$numrows = db_affected_rows($result);
+
+                        $outline.= 'tcch_request_id|';
+                        $outline.= 'tcch_user_id|';
+                        $outline.= 'last_name|';
+                        $outline.= 'first_name|';
+                        $outline.= 'mid_init|';
+                        $outline.= 'other_names|';
+                        $outline.= 'owner_user_id|';
+                        $outline.= 'request_type|';
+                        $outline.= 'request_date|';
+                        $outline.= 'status|';
+                        $outline.= 'ssn_last4|';
+                        $outline.= 'pay_grade|';
+                        $outline.= 'service_branch_pri|';
+                        $outline.= 'status_pri|';
+                        $outline.= 'date_of_birth|';
+                        $outline.= 'address|';
+                        $outline.= 'city|';
+                        $outline.= 'state_cd|';
+                        $outline.= 'zip_code|';
+                        $outline.= 'tx_address|';
+                        $outline.= 'tx_city|';
+                        $outline.= 'tx_state_cd|';
+                        $outline.= 'tx_zip_code|';
+                        $outline.= 'phone_number|';
+                        $outline.= 'email|';
+                        $outline.= 'eval_request_id|';
+                        $outline.= 'active_status|';
+                        $outline.= 'create_datetime|';
+                        $outline.= 'submit_datetime|';
+                        $outline.= 'process_datetime|';
+                        $outline.= 'complete_datetime|';
+                        $outline.= 'final_datetime|';
+                        $outline.= 'cancel_datetime|';
+                        $outline.= 'retire_datetime|';
+                        $outline.= 'last_doc_datetime|';
+                        fputs($outfile, $outline."\r\n");
+                        $outline="";
+
+              		while($rrow = db_fetch_object($result)) {
+
+                        	$outline.= ($rrow->tcch_user_id)."|";
+                        	$outline.= ($rrow->last_name)."|";
+                        	$outline.= ($rrow->first_name)."|";
+                        	$outline.= ($rrow->mid_init)."|";
+                        	$outline.= ($rrow->other_names)."|";
+                        	$outline.= ($rrow->owner_user_id)."|";
+                        	$outline.= ($rrow->request_type)."|";
+                        	$outline.= ($rrow->request_date)."|";
+                        	$outline.= ($rrow->status)."|";
+                        	$outline.= ($rrow->ssn_last4)."|";
+                        	$outline.= ($rrow->pay_grade)."|";
+                        	$outline.= ($rrow->service_branch_pri)."|";
+                        	$outline.= ($rrow->status_pri)."|";
+                        	$outline.= ($rrow->date_of_birth)."|";
+                        	$outline.= ($rrow->address)."|";
+                        	$outline.= ($rrow->city)."|";
+                        	$outline.= ($rrow->state_cd)."|";
+                        	$outline.= ($rrow->zip_code)."|";
+                        	$outline.= ($rrow->tx_address)."|";
+                        	$outline.= ($rrow->tx_city)."|";
+                        	$outline.= ($rrow->tx_state_cd)."|";
+                        	$outline.= ($rrow->tx_zip_code)."|";
+                        	$outline.= ($rrow->phone_number)."|";
+                        	$outline.= ($rrow->email)."|";
+                        	$outline.= ($rrow->eval_request_id)."|";
+                        	$outline.= ($rrow->active_status)."|";
+                        	$outline.= ($rrow->create_datetime)."|";
+                        	$outline.= ($rrow->submit_datetime)."|";
+                        	$outline.= ($rrow->process_datetime)."|";
+                        	$outline.= ($rrow->complete_datetime)."|";
+                        	$outline.= ($rrow->final_datetime)."|";
+                        	$outline.= ($rrow->cancel_datetime)."|";
+                        	$outline.= ($rrow->retire_datetime)."|";
+                        	$outline.= ($rrow->last_doc_datetime)."|";
+
+                   		if ($outputfilename) {
+                          		fputs($outfile, $outline."\r\n");
+                          		$outline="";
+                   		}
+
+              		}
+		break;
+                case 'DF-survey_poll':
+                        $sql = "
+SELECT up.last_name, up.first_name, s.sid, from_unixtime(ws.submitted) as response_datetime, c.name, s.no,  s.data
+from webform_component c, webform_submitted_data s, webform_submissions ws, user_profile up
+where c.nid = s.nid and c.cid = s.cid and c.nid = 236  and (s.nid = ws.nid and s.sid = ws.sid)
+AND ws.uid = up.uid
+AND s.data != '' AND
+('".$_POST['last_name']."' = '' OR up.last_name LIKE '".$_POST['last_name']."%') AND
+('".$_POST['first_name']."' = '' OR up.first_name LIKE '".$_POST['first_name']."%') AND
+from_unixtime(ws.submitted) between if ('".$start_date."' = '', '2012-01-01', '".$start_date."') and  if ('".$end_date."' = '', '2099-01-01', '".$end_date."')
+order by 1,2,3,4,5,6";
+                        $result = db_query($sql);
+                        $numrows = db_affected_rows($result);
+
+                        $outline.= 'last_name|';
+                        $outline.= 'first_name|';
+                        $outline.= 'survey_id|';
+                        $outline.= 'response_datetime|';
+                        $outline.= 'question|';
+                        $outline.= 'answer_no|';
+                        $outline.= 'answer|';
+                        fputs($outfile, $outline."\r\n");
+                        $outline="";
+
+                        while($rrow = db_fetch_object($result)) {
+                                $outline.= ($rrow->last_name)."|";
+                                $outline.= ($rrow->first_name)."|";
+                                $outline.= ($rrow->sid)."|";
+                                $outline.= ($rrow->response_datetime)."|";
+                                $outline.= ($rrow->name)."|";
+                                $outline.= ($rrow->no)."|";
+                                $outline.= ($rrow->data)."|";
+
+                                if ($outputfilename) {
+                                        fputs($outfile, $outline."\r\n");
+                                        $outline="";
+                                }
+
+                        }
+                break;
+
+		case 'DF-other':
+			$sql = "";
+              		$result = db_query($sql);
+              		$numrows = db_affected_rows($result);
+
+                        $outline.= 'created_datetime|';
+                        fputs($outfile, $outline."\r\n");
+                        $outline="";
+
+              		while($rrow = db_fetch_object($result)) {
+
+                        	$outline.= ($rrow->created_datetime)."|";
+
+                   		if ($outputfilename) {
+                          		fputs($outfile, $outline."\r\n");
+                          		$outline="";
+                   		}
+
+              		}
+		break;
+		}
+
+
+		drupal_goto('reports/mn/dm');
+// --------------------------------  end  ----------------------------------------
+
+
+
+} else {
+//gototest
+ 
+
+//                drupal_goto($base_url.'/sites/all/modules/tcch_reports/rep_inc/'.$_SESSION['report_name'].'.php'.$searchcriteria);
+                drupal_goto($base_url.'/sites/all/modules/tcch_reports/rep_inc/CCH-generic.php'.$searchcriteria);
+}
+}
+
+
+
+  function theme_tcch_report_function($form) {
+    //define table header
+
+    $header = array(
+      theme('table_select_header_cell'), //using that previously empty field
+      array('data' => t('Request ID'), 'field' => 'tcch_request_id', 'sort' => 'asc'),
+      array('data' => t('Last Name'), 'field' => 'last_name'),
+      array('data' => t('First Name'), 'field' => 'first_name'),
+      array('data' => t('Service Branch'), 'field' => 'service_branch'),
+      array('data' => t('Attachments'), 'field' => 'attach'),
+      array('data' => t('Owner'), 'field' => 'owner_user_id'),
+    );
+    if(!empty($form['checkboxes']['#options'])) {
+      foreach (element_children($form['tcch_request_id']) as $key) {
+        $rows[] = array(
+          drupal_render($form['checkboxes'][$key]),
+          drupal_render($form['tcch_request_id'][$key]),
+          drupal_render($form['last_name'][$key]),
+          drupal_render($form['first_name'][$key]),
+          drupal_render($form['service_branch_pri'][$key]),
+          drupal_render($form['attach'][$key]),
+          drupal_render($form['owner_user_id'][$key]),
+       );
+      }
+    } else {
+      $rows[] = array(array('data' => '<div class="error">No users found</div>', 'colspan' => 4));
+    }
+      $rows[] = array(array('data' => '&nbsp', 'colspan' => 11));
+      $rows[] = array(array('data' => '<input type=submit name=submit value=submit class=form-submit>', 'colspan' => 11, 'align' => 'right'));
+//herehere
+    $output .= theme('table', $header, $rows, array('class' => 'cch-searchresult-table', 'cellpadding'=>'10%','cellspacing'=>10,'border'=>1));
+    if ($form['pager']['#value']) {
+        drupal_render($form['pager']['submit']);
+      $output .= drupal_render($form['pager']);
+    }
+
+    $output .= drupal_render($form);
+    return $output;
+  }
+
+
+
+function tcch_report_update() {
+
+
+	$payment_no = arg(2);
+	$oid = arg(3);
+
+        if ($payment_no and $oid) {
+                $payment_sql = "UPDATE part_college_payment set order_id ='".$oid."', order_date = current_date WHERE order_id is null AND payment_no = ".$payment_no ;
+                $payment_result = db_query($payment_sql) ;
+                drupal_set_message('Order: '.$oid.' for Payment No: '.$payment_no.' has been sent') ;
+        }
+
+      echo "<html><head><script>top.location.href='?q=collegedues/cp/';</script></head><body></body></html>";
+
+}
+
+function tcch_report_run_form() {
+
+/*
+	global $user;
+        if (!$user->uid) {
+                drupal_set_message("Report Requests can only be made by Logged In Users - Please Log In");
+                drupal_goto('');
+        }
+	$uid = $_GET['uid'] ;
+  	$form = array();
+
+        $sql = "SELECT uid, name, mail from users where uid = ".$user->uid ;
+
+        $result = db_query($sql);
+        $preitem = db_fetch_object($result) ;
+
+
+        $prerows[] = array('Name:','<b>'.$preitem->name.'</b>') ;
+        $prerows[] = array('Email:','<b>'.$preitem->mail.'</b>') ;
+	$cid = $preitem->college_id;
+        $form['name'] = array(
+                '#type' => 'fieldset',
+                '#collapsible' => FALSE,
+                '#collapsed' => FALSE,
+        );
+
+  	$form['name']['table'] = array(
+      		'#value' => theme('table', $header, $prerows),
+  	);
+	$feesql = "SELECT report_id, report_name, report_location, report_output from tcch_reports order by sort_order ";
+
+        $feeresult = db_query($feesql) ;
+        $feerows = array();
+        switch ($feeresult->num_rows) {
+        	case 0:
+                $feeheader = array('','','','','','','','');
+                break;
+                default:
+                $feeheader = array('Report ID','Report Name','Report Location','Report Output');
+                $fee_count = 0;
+                while($row = db_fetch_object($feeresult)) {
+			$editlink = "<a href='?q=reports/cc'>".$row->report_id."</a>" ; 
+//			$editlink = "<a href='?q=college_payment_send/form&pno=".$row->report_id."' rel='lightframe[|width:900px; height:500px; scrolling:auto;][Edit Order]'>".$row->report_id."</a>" ; 
+                        $feerows [] = array( $editlink,
+    			$row->report_name, $row->report_location, $row->report_output);
+                        $fee_count = $fee_count + 1;
+                }
+
+         }
+
+
+                                $form['name']['request_frame'] = array(
+                                '#type' => 'fieldset',
+                                '#title' => t('Available Reports:'),
+                                '#collapsible' => FALSE,
+                                '#collapsed' => FALSE,
+                                );
+                                $form['name']['request_frame']['request_table'] = array(
+                                '#value' => theme('table', $feeheader, $feerows),
+                                );
+ 
+ $form['name']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+  );
+
+*/
+// include_once('CCH-course.php') ;
+ include_once('rep_inc/jasper.php') ;
+
+report_execute ("CCH-course", "CCH-course.pdf") ;
+
+return $form;
+
+}
+
+
+
+function thisisatest_form() {
+$folder = '/tmp/';
+$download = $_POST['download'];
+if (isset($download)) {
+    $fullPath = $folder.$_POST['file_in_folder'];
+/* moved this from below */
+$myfile = $_POST['file_in_folder'];
+
+/* $fsize = filesize($myfile); */
+
+header("Pragma: public");
+header("Expires: 0");
+header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+header("Cache-Control: public");
+header("Content-Description: File Transfer");
+/* header("Content-Type: $mtype"); */
+
+header("Content-Type: application/force-download");
+header("Content-disposition: attachment; filename=\"$myfile\"");
+header("Content-Transfer-Encoding: binary");
+/* header("Content-Length: " . $fsize); */
+
+/*
+header ("Content-Type: application/octet-stream");
+header ("Content-Disposition: attachment; filename=$myfile");
+*/
+/* moved this from below */
+//Exec moved to convert file prior to handle opening, otherwise file is still unix format
+//      exec("/usr/bin/unix2dos -o ".$fullPath);
+/* added by dave for debugging on April 19, 2007*/
+    error_log(date("Ymd - H:i:s"). "This is the value of fullPath : " . $fullPath, 0);
+/*
+    $fd = fopen ($fullPath, "r") ;
+*/
+    if ($fd = fopen ($fullPath, "r")) {
+        $fsize = filesize($fullPath);
+        $path_parts = pathinfo($fullPath);
+        $ext = strtolower($path_parts["extension"]);
+        header("Content-length: $fsize");
+        header("Cache-control: private");
+        while(!feof($fd)) {
+            $buffer = fread($fd, 2048);
+            echo $buffer;
+        }
+    }
+    fclose ($fd);
+}
+
+$folder = '/tmp/';
+  $form['name'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Please select the file that you wish to download.'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+  );
+/*
+echo '<html>' ;
+echo '<head>' ;
+echo '<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">';
+*/
+// //echo '<title>File Download</title>';
+
+// echo '</head>';
+// echo '<body onLoad="javascript:window.resizeTo(425,555);return false;">';
+// //echo '<div id="main">';
+// //echo '<h2 style="text-align:center;margin-top:10px;">File download </h2>';
+// echo '<?php echo select_files($folder, $dloadfile, $choose); >';
+// select_files($folder, $dloadfile, $choose); 
+    $teller = 0;
+//    if ($handle = opendir($dir)) {
+	$file_in_folder = variable_get('download_file_name',null);
+    if ($handle = opendir($folder)) {
+
+        $mydir = "<p>Available Files for Download:</p>\n";
+//        $mydir .= "<form name=\"form1\" method=\"post\" action=\"".$PHP_SELF."\">\n";
+        $mydir .= "  <select name=\"file_in_folder\">\n";
+        $mydir .= "    <option value=\"\" selected>... \n";
+        while (false !== ($file = readdir($handle))) {
+            $files[] = $file;
+        }
+        sort($files);
+        if ($dloadfile) {
+                        $mydir .= "    <option value=\"".$dloadfile."\">";
+                        $mydir .= (strlen($dloadfile) > 30) ? substr($dloadfile, 0, 30)."...\n" : $dloadfile."\n";
+                        $teller++;
+        } else {
+		if ($file_in_folder) {
+                        $mydir .= "    <option selected value=\"".$file_in_folder."\">";
+                                        $mydir .= $file_in_folder."\n";
+                        $teller++;
+
+		} else {
+                        foreach ($files as $val) {
+                                if ($val != "." && $val != ".." && (stristr($val,".txt") OR stristr($val,".csv") OR stristr($val,".jasper"))) {
+					if ($file_in_folder == $val) {
+                                        	$mydir .= "    <option selected value=\"".$val."\">";
+					} else {
+                                        	$mydir .= "    <option value=\"".$val."\">";
+					}
+                                        $mydir .= (strlen($val) > 30) ? substr($val, 0, 30)."...\n" : $val."\n";
+                                        $teller++;
+                                }
+                        }
+		}
+        }
+
+        $mydir .= "  </select>";
+        $mydir .= "<input type=\"submit\" name=\"download\" value=\"Download\">";
+        $mydir .= "</form>\n";
+        closedir($handle);
+    }	
+    if ($teller == 0) {
+  	$form['name']['prestuff'] = array(
+        	'#value' => 'No files!!',
+	);
+    } else {
+  	$form['name']['stuff'] = array(
+        	'#value' => $mydir,
+	);
+    }
+// }
+echo '</div>';
+// echo '<br><br>';
+  	$form['name']['poststuff'] = array(
+        	'#value' => "<input type=Button name=REPORTRETURN value=\"Return to Reports\" onclick=\"location.href='?q=reports/mn'\">",
+         );
+
+return $form;
+
+}
+
+

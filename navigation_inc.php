@@ -6,7 +6,7 @@ if (!session_is_registered("userid"))
 	exit;
 } else {
 
-	if ($usertype == 'admin' or $usertype == 'vendor') {
+	if ($user_type == 'admin' or $user_type == 'vendor') {
 
 	if(!$key_attribute) {
 		$menu_enabled=0;
@@ -52,6 +52,6 @@ if (!session_is_registered("userid"))
 		}
 
 	}
-$left_menu = display_menu_array($db,(substr($PHP_SELF, (strrpos($PHP_SELF, "/") + 1), 35)),$HTTP_REFERER,$menu_enabled, $userlevel);
+$left_menu = display_menu_array($db,(substr($PHP_SELF, (strrpos($PHP_SELF, "/") + 1), 35)),$HTTP_REFERER,$menu_enabled, $user_level);
 }
 ?>

@@ -1,0 +1,157 @@
+<?php
+
+class mysqldb {
+
+    //set up the object
+    var $host;
+    var $db;
+    var $dbuser;
+    var $dbpassword;
+    var $sql;
+    var $numberrows;
+    var $dbopenstatus;
+    var $dbconnection;
+    /*
+        Use these functions to get and set the values of this object's
+        variables. This is good OO practice, as it means that datatype 
+        checking can be completed and errors raised accordingly. 
+
+    */
+
+    // Property Get & Set
+        
+    function gethost() {
+        return $this->dbhost;
+    }
+            
+    function sethost($req_host) {
+        $this->dbhost = $req_host;
+        
+    }
+            
+    function getdb() {
+        return $this->db;
+    }
+            
+    function setdb($req_db) {
+        $this->db = $req_db;
+    }
+            
+    function getdbuser() {
+        return $this->dbuser;
+    }
+            
+    function setdbuser($req_user) {
+        $this->dbuser = $req_user;
+    }
+            
+    function getdbpassword() {
+        return $this->dbpassword;
+    }
+            
+    function setdbpassword($req_password) {
+        $this->dbpassword = $req_password;
+    }
+            
+    function getsql() {
+        return $this->sql;
+    }
+            
+    function setsql($req_sql) {
+        $this->sql = $req_sql;
+    }
+            
+    function getnumberrows() {
+        return $this->numberrows;
+    }
+            
+    function setnumberrows($req_numberresults) {
+        $this->numberesults = $req_numberresults;
+    }
+        
+    function setdbconnection($req_dbconnection) {
+        $this->dbconnection = $req_connection;
+    }
+            
+    function getdbconnection() {
+        return $this->dbconnection;
+    }
+        
+    /*
+        This is the constructor for the object. In this case I have set
+        the initial values of a number of the object properties to those 
+        values declared in the global constants.inc. By doing this, I 
+        only need to change the values of these properties for specific
+        operations, which we will not need to do throughout this example
+
+    */        
+    function mysqldb() {
+    
+        global $HOST, $DB, $WEBUSER, $WEBPASSWORD;
+        global $TRUE, $FALSE;
+        
+        $this->sethost($HOST);
+        $this->setdb($DB);
+        $this->setdbuser($WEBUSER);
+        $this->setdbpassword($WEBPASSWORD);
+        $this->setdbconnection($FALSE);
+    
+    }
+            
+    /*
+        These are the methods for the object. They provide for opening a
+        connection to the database, closing a connection and executing a 
+        SELECT query. Of course, these can be expanded upon to allow for 
+        INSERT's, UPDATE's and DELETE's etc...
+    */
+    function opendbconnection() {
+
+        global $TRUE, $FALSE;
+                
+        $this->dbconnection = mysql_connect("$this->dbhost", "$this->dbuser", "$this->dbuserpassword");
+        if ($this->dbconnection == $TRUE) {
+            $this->db = mysql_select_db("$this->db");
+            $this->setdbconnection($TRUE);
+        } else {
+            $this->setdbconnection($FALSE);
+            return false;
+        }
+        return true;
+    }
+            
+    function closedbconnection() {
+
+        if ($this->dbconnection = $TRUE) {
+            mysql_close($this->dbconnection);
+        }
+                
+    }
+    
+    function selectquery() {
+        
+        global $TRUE, $FALSE;
+    
+        if ($this->dbconnection == $FALSE) {
+            $this->opendbconnection();
+        }
+    
+        $this->qry = mysql_query($this->sql);
+        if (!$this->qry) {
+            return false;
+        } else {
+            $this->numberrows = mysql_num_rows($this->qry);
+            if ($this->numberrows > 0) {
+                for($x = 0; $x > $this->numberrows; $x++) {
+                    $this->result[$x] = mysql_fetch_row($this->qry);
+                }
+            } else {
+                echo("[Error:] Retrieving data");
+                return false;
+            }
+            return true;
+        }
+    }
+    
+}
+    
+?>
