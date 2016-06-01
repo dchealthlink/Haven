@@ -1,26 +1,26 @@
 <?php
 
-$sql = "select c.relname, a.attname, a.attnum, a.attlen, a.atttypmod, a.attnotnull, t.typname, tf.field_label, tf.addl_text, tf.read_write, tf.sort_order, case when a.attnotnull = 't' then 't' else tf.field_mandatory end as field_mandatory, tf.addl_text_pos " ;
-$sql.= " from pg_class c, pg_attribute a, pg_type t, table_field_access tf" ;
-$sql.= " where c.relname = '".$header_table."' and c.oid = a.attrelid and a.attnum > 0 and " ;
-$sql.= " a.atttypid = t.oid ";
-$sql.= " and ((cast(c.relname as varchar) = tf.table_name) and (cast(a.attname as varchar) = tf.field_name)) and ";	
-
+	$sql = "select c.relname, a.attname, a.attnum, a.attlen, a.atttypmod, a.attnotnull, t.typname, tf.field_label, tf.addl_text, tf.read_write, tf.sort_order, case when a.attnotnull = 't' then 't' else tf.field_mandatory end as field_mandatory, tf.addl_text_pos " ;
+	$sql.= " from pg_class c, pg_attribute a, pg_type t, table_field_access tf" ;
+	$sql.= " where c.relname = '".$header_table."' and c.oid = a.attrelid and a.attnum > 0 and " ;
+	$sql.= " a.atttypid = t.oid ";
+	$sql.= " and ((cast(c.relname as varchar) = tf.table_name) and (cast(a.attname as varchar) = tf.field_name)) and ";	
 if ($acc_method) {
 	$sql.= " tf.access_type='".$acc_method."'";	
 } else {
 	$sql.= " tf.access_type='insert'";	
-}
 
-$sql.= " order by 1, 11" ;
+}
+	$sql.= " order by 1, 11" ;
 
 $result = pg_exec($db,$sql);
-
+        
 $numrows = pg_numrows($result);
-if(pg_ErrorMessage($db)) {
+if(pg_ErrorMessage($db))
+        {
         DisplayErrMsg(sprintf("Executing %s ", $sql)) ;
         DisplayErrMsg(sprintf("Error: %s", pg_ErrorMessage($db))) ;
-};
+        };
 
 if ($numrows <= 0) {
         $sql = "select c.relname, a.attname, a.attnum, a.attlen, a.atttypmod, a.attnotnull, t.typname, a.attname as field_label, null as addl_text, 'W' as read_write, a.attnum as sort_order, a.attnotnull as field_mandatory , null as addl_text_pos" ;
@@ -29,10 +29,11 @@ if ($numrows <= 0) {
         $sql.= " a.atttypid = t.oid ";
         $sql.= " order by 1, 11" ;
 
-	$result = pg_exec($db,$sql);
-	if(pg_ErrorMessage($db)) {
-        	DisplayErrMsg(sprintf("Executing %s ", $sql)) ;
-        	DisplayErrMsg(sprintf("Error: %s", pg_ErrorMessage($db))) ;
+$result = pg_exec($db,$sql);
+if(pg_ErrorMessage($db))
+        {
+        DisplayErrMsg(sprintf("Executing %s ", $sql)) ;
+        DisplayErrMsg(sprintf("Error: %s", pg_ErrorMessage($db))) ;
         };
 }
 
@@ -41,29 +42,16 @@ $rownum = 0;
 ?>
 <table border=0 cellspacing=0 cellpadding=2 bordercolor=#eeeeee > 
 <?
-echo "<tr valign=top>";
-
-$colspanneeded = " colspan=7 ";
+echo "<tr align=top>";
 
 if ($orient == "horizontal") {
 
-	$colspanneeded = "";
-
-	while ($row = pg_fetch_array($result,$rownum)) {
-
+	while ($row = pg_fetch_array($result,$rownum))
+	{
         	$matrix[$rownum + 0][1] = $row[pg_fieldname($result,1)];
 
-/* ==== new ========= */
-		if ($row[pg_fieldname($result,9)] != 'H') {
+	        echo "<td>".ucfirst(ereg_replace("_"," ",$matrix[$rownum][1]))."</td>";
 
-			if ($row[pg_fieldname($result,7)]) {
-	        		echo "<td>".ucfirst(ereg_replace("_"," ",$row[pg_fieldname($result,7)]))."</td>";
-
-			} else {
-	        		echo "<td>".ucfirst(ereg_replace("_"," ",$matrix[$rownum][1]))."</td>";
-
-			}		
-		}
 		$rownum = $rownum + 1;
 	}
 	echo "</tr>";
@@ -72,15 +60,16 @@ if ($orient == "horizontal") {
 
 $rownum = 0;
 
-while ($row = pg_fetch_array($result,$rownum)) {
+while ($row = pg_fetch_array($result,$rownum))
+{
         $matrix[$rownum + 0][1] = $row[pg_fieldname($result,1)];
         $matrix[$rownum][2] = $row[pg_fieldname($result,4)] - 4;
-	if ($row[pg_fieldname($result,4)] < 59) {
-        	$matrix[$rownum][6] = $row[pg_fieldname($result,4)] - 4;
-	} else {
-        	$matrix[$rownum][6] = 55;
+if ($row[pg_fieldname($result,4)] < 59) {
+        $matrix[$rownum][6] = $row[pg_fieldname($result,4)] - 4;
+} else {
+        $matrix[$rownum][6] = 55;
 
-	}
+}
         $matrix[$rownum][3] = $row[pg_fieldname($result,6)];
         $matrix[$rownum][5] = $row[pg_fieldname($result,7)];
         $matrix[$rownum][7] = $row[pg_fieldname($result,8)];
@@ -101,17 +90,18 @@ while ($row = pg_fetch_array($result,$rownum)) {
 			}
 			switch ($matrix[$rownum][10]) {
 
-				case 'T':
-        			 	echo "<tr><td colspan=10 align=center>".$addl_info."</td></tr>";  
-        	 			echo "<tr><td>&nbsp;</td>";  
-				break;
-				case 'L':
-        	 			echo "<tr><td>".$addl_info."</td>";  
-				break;
-				default:
-        	 			echo "<tr><td>&nbsp;</td>";  
+			case 'T':
+        	 	echo "<tr><td colspan=10 align=center>".$addl_info."</td></tr>";  
+        	 	echo "<tr><td>&nbsp;</td>";  
+			break;
+			case 'L':
+        	 	echo "<tr><td>".$addl_info."</td>";  
+			break;
+			default:
+        	 	echo "<tr><td>&nbsp;</td>";  
 
 			}
+
 
         		echo "<td align=right nowrap>".$matrix[$rownum][5]." : </td>";
 		}
@@ -136,25 +126,18 @@ while ($row = pg_fetch_array($result,$rownum)) {
         $lookupdesc = $rowarr[4];
         $lookupreplace_field = $rowarr[5];
         $lookupsort_order = $rowarr[6];
-	$lookup_where = $rowarr[7];
 
         if  ((pg_NumRows($l_result) > 0) and ($matrix[$rownum][8] == 'W')) {
 
                 if ($lookuptable != "app_lookup") {
                         $l_sql="SELECT ".$lookupfield." as item_cd, ".$lookupdesc." as item_description,";
                         $l_sql.=$lookupreplace_field." as item_translation from ".$lookuptable." ";
-			if ($lookup_where) {
-				$l_sql.= " WHERE ".$lookup_where." ";
-			}
                         $l_sql.=" order by ".$lookupsort_order ;
                 } else {
                         $l_sql="SELECT item_cd, item_description, item_translation ";
                         $l_sql.=" FROM app_lookup ";
                         $l_sql.=" WHERE lookup_table = '".$header_table."' AND ";
                         $l_sql.=" lookup_field ='".$matrix[$rownum][1]."' ";
-			if ($lookup_where) {
-				$l_sql.= " AND ".$lookup_where." ";
-			}
                         $l_sql.=" order by sort_order";
                 }
 
@@ -192,16 +175,12 @@ while ($row = pg_fetch_array($result,$rownum)) {
                         if ($item_cd == $$matrix[$rownum][1]) {
                                 echo "<option class=pink SELECTED value='".$item_translation."'>".$item_cd;
 				if ($item_description) {
-                                	echo " - ".$item_description;
-/* ====== here ===== */
-					$item_description = "";
+                                echo " - ".$item_description;
 				}
                         } else {
                                 echo "<option value='".$item_translation."'><font size=8>".$item_cd;
 				if ($item_description) {
-                                	echo " - ".$item_description."</font>";
-/* ====== here ===== */
-					$item_description = "";
+                                echo " - ".$item_description."</font>";
 				}
                         }
 
@@ -315,13 +294,10 @@ echo "<input type=hidden name=sub_cat value=ALL>";
                 echo "<input type=hidden  name=".$matrix[$rownum][1]." value=".$$matrix[$rownum][1].">";
 			if ($matrix[$rownum][8] == 'R') { 
                 echo "<td>".$$matrix[$rownum][1].$db_item_description."</td>";
-/* ===== here ==== */
-			$db_item_description = "";
-
 			}
 
 			} else {
-                 echo "<td valign=top ".$colspanneeded."><input type=text class=pink maxlength=4 size=5 name=".$matrix[$rownum][1]." value='".$$matrix[$rownum][1]."' onblur=BisInt(this,4,'N')></td>"; 
+                echo "<td colspan=7><input type=text class=pink maxlength=4 size=5 name=".$matrix[$rownum][1]." value='".$$matrix[$rownum][1]."' onblur=BisInt(this,4,'N')></td>";
 			}
                                 break;
                         case "int4" :
@@ -331,55 +307,41 @@ echo "<input type=hidden name=sub_cat value=ALL>";
 			if ($matrix[$rownum][8] == 'R' or $matrix[$rownum][8] == 'H') {
                 echo "<input type=hidden  name=".$matrix[$rownum][1]." value=".$$matrix[$rownum][1].">";
 			if ($matrix[$rownum][8] == 'R') { 
-                echo "<td valign=top>".$$matrix[$rownum][1].$db_item_description."</td>";
-/* ===== here ==== */
-			$db_item_description = "";
+                echo "<td>".$$matrix[$rownum][1].$db_item_description."</td>";
 			}
 
 			} else {
-
-
-				if ($matrix[$rownum][1] == 'req_quantity') {
-                			echo "<td valign=top ".$colspanneeded."><input type=text class=pink maxlength=8 size=9 name=".$matrix[$rownum][1]." value='".$$matrix[$rownum][1]."' onblur=BisInt(this,8,'N') onChange=calc_int(this)></td>"; 
-				} else {
-                			echo "<td valign=top ".$colspanneeded."><input type=text class=pink maxlength=8 size=9 name=".$matrix[$rownum][1]." value='".$$matrix[$rownum][1]."' onblur=BisInt(this,8,'N')></td>"; 
-				}
+                echo "<td colspan=7><input type=text class=pink maxlength=8 size=9 name=".$matrix[$rownum][1]." value='".$$matrix[$rownum][1]."' onblur=BisInt(this,8,'N')></td>";
 			}
                                 break;
                         case "numeric" :
 			if ($matrix[$rownum][8] == 'R') {
                 echo "<td><input type=hidden  name=".$matrix[$rownum][1]." value=".$$matrix[$rownum][1].">".$$matrix[$rownum][1]."</td>";
 			} else {
-                echo "<td valign=top ".$colspanneeded."><input type=text class=pink maxlength=14 size=15 name=".$matrix[$rownum][1];
+                echo "<td colspan=7><input type=text class=pink maxlength=14 size=15 name=".$matrix[$rownum][1];
 		if ($flddisp != 'N') {
 			echo " value='".$$matrix[$rownum][1]."'";
-		}
-			if ($matrix[$rownum][1] == 'req_unit_cost') {
-				echo " onblur=BisNum(this,14,'N') onChange=calc_it(this)></td>";
-			} else {
-				echo " onblur=BisNum(this,14,'N')></td>";
+	}
+		echo " onblur=BisNum(this,14,'N')></td>";
 			}
-		}
                                 break;
                         case "timestamp" :
 
 			if ($matrix[$rownum][8] == 'R' or $matrix[$rownum][8] == 'H') {
-                echo "<input type=hidden  name=".$matrix[$rownum][1]." value='".$$matrix[$rownum][1]."'>";
+                echo "<input type=hidden  name=".$matrix[$rownum][1]." value=".$$matrix[$rownum][1].">";
 			if ($matrix[$rownum][8] == 'R') { 
-                echo "<td valign=top>".$$matrix[$rownum][1].$db_item_description."</td>";
-/* ===== here ==== */
-			$db_item_description = "";
+                echo "<td>".$$matrix[$rownum][1].$db_item_description."</td>";
 			}
 
 			} else {
-                echo "<td valign=top ".$colspanneeded."><input type=text class=pink maxlength=25 size=26 name=".$matrix[$rownum][1]." value='".$$matrix[$rownum][1]."' onblur=BisTimestamp(this,25,'N')></td>";
+                echo "<td colspan=7><input type=text class=pink maxlength=25 size=26 name=".$matrix[$rownum][1]." value='".$$matrix[$rownum][1]."' onblur=BisTimestamp(this,25,'N')></td>";
 			}
                                 break;
                         case "date" :
 			if ($matrix[$rownum][8] == 'R') {
                 echo "<td><input type=hidden  name=".$matrix[$rownum][1]." value='".$$matrix[$rownum][1]."'>".$$matrix[$rownum][1]."</td>";
 			} else {
-                echo "<td valign=top ".$colspanneeded."><input type=text class=pink maxlength=10 size=11 name=".$matrix[$rownum][1];
+                echo "<td colspan=7><input type=text class=pink maxlength=10 size=11 name=".$matrix[$rownum][1];
 		if ($flddisp != 'N') {
  			echo " value='".$$matrix[$rownum][1]."'"; 
 		}
@@ -387,29 +349,14 @@ echo "<input type=hidden name=sub_cat value=ALL>";
 			}
                                 break;
 
-                        case "time" :
-			if ($matrix[$rownum][8] == 'R') {
-                echo "<td><input type=hidden  name=".$matrix[$rownum][1]." value='".$$matrix[$rownum][1]."'>".$$matrix[$rownum][1]."</td>";
-			} else {
-                echo "<td valign=top ".$colspanneeded."><input type=text class=pink maxlength=8 size=9 name=".$matrix[$rownum][1];
-		if ($flddisp != 'N') {
- 			echo " value='".$$matrix[$rownum][1]."'"; 
-		}
-		echo " onblur=BisTime(this,10,'N')></td>";
-			}
-                                break;
-
-
-
-
                         case "text" :
 			if ($matrix[$rownum][8] == 'R') {
                 echo "<td><input type=hidden  name=".$matrix[$rownum][1]." value='".$$matrix[$rownum][1]."'>".$$matrix[$rownum][1]."</td>";
 			} else {
 		if ($flddisp != 'N') {
-                	echo "<td valign=top ".$colspanneeded."><textarea class=pink rows=10 cols=100 name=".$matrix[$rownum][1].">".$$matrix[$rownum][1]."</textarea></td>";
+                	echo "<td colspan=7><textarea class=pink rows=10 cols=90 name=".$matrix[$rownum][1].">".$$matrix[$rownum][1]."</textarea></td>";
 		} else { 
-                	echo "<td valign=top ".$colspanneeded."><textarea class=pink rows=10 cols=100 name=".$matrix[$rownum][1]."></textarea></td>";
+                	echo "<td colspan=7><textarea class=pink rows=10 cols=90 name=".$matrix[$rownum][1]."></textarea></td>";
 
 		}		
 		}
@@ -420,9 +367,7 @@ echo "<input type=hidden name=sub_cat value=ALL>";
 			if ($matrix[$rownum][8] == 'R' or $matrix[$rownum][8] == 'H') {
                 echo "<input type=hidden  name=".$matrix[$rownum][1]." value='".$$matrix[$rownum][1]."'>";
 			if ($matrix[$rownum][8] == 'R') {
-                echo "<td valign=top >".$$matrix[$rownum][1].$db_item_description."</td>";
-/* ===== here ==== */
-			$db_item_description = "";
+                echo "<td>".$$matrix[$rownum][1].$db_item_description."</td>";
 			}
 
 			} else {
@@ -431,7 +376,7 @@ echo "<input type=hidden name=sub_cat value=ALL>";
 			$inptype = "password";
 		}
 
-                echo "<td valign=top ".$colspanneeded."><input type=".$inptype." class=pink size=".$matrix[$rownum][6]." maxlength=".$matrix[$rownum][2]." size=".$matrix[$rownum][2]." name=".$matrix[$rownum][1]." ;";
+                echo "<td colspan=7><input type=".$inptype." class=pink size=".$matrix[$rownum][6]." maxlength=".$matrix[$rownum][2]." size=".$matrix[$rownum][2]." name=".$matrix[$rownum][1]." ;";
 	if ($flddisp != 'N') {
             echo " value='".$$matrix[$rownum][1]."'>";
 	}
@@ -446,13 +391,12 @@ echo "<input type=hidden name=view_type[] value=".$matrix[$rownum][3].">";
 echo "<input type=hidden name=lookup[] value=".$matrix[$rownum][4].">";
 */
 if ($matrix[$rownum][10] == 'R') {
-        echo "<td valign=top>".$addl_info."</td>";
+        echo "<td>".$addl_info."</td>";
 
 } else {
-/* == new == */
-	if ($matrix[$rownum][8] != 'R' AND $matrix[$rownum][8] != 'H') {
-        /* 	echo "<td>&nbsp;</td>"; */
-	}
+
+        echo "<td>&nbsp;</td>";
+
 }
 
 $rownum = $rownum + 1;

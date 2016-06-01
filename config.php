@@ -1,21 +1,6 @@
-<?php
+<?
 
-error_reporting(E_ERROR);
-
-$sesssql = "SELECT curr_session_id, first_login, last_touch, now()::timestamp - last_touch as curr_diff, case when (now()::timestamp - last_touch) > '00:45:00' then 'Y' else 'N' end as timeout_param, user_id, page_hits + 1 FROM curr_session WHERE curr_session_id = '".(session_id())."'";
-        $sess_result = pg_exec($db,$sesssql);
-        list ($sess_id, $sess_first, $sess_last_touch, $sess_diff, $timeout_param, $sess_user_id, $sess_page_hits) = pg_fetch_row($sess_result,0);
-
-        if ($sess_id) {
-                $upd_sql = "UPDATE curr_session set page_hits = ".$sess_page_hits.", last_touch = now() WHERE curr_session_id = '".$sess_id."'";
-                $upd_result = pg_exec($db,$upd_sql);
-        }
-        if ($timeout_param == 'Y') {
-                header("Location: index.php?msg=timeout");
-                exit;
-        }
-
-
+error_reporting(5);
 $locality_sql = "select * from configuration where locality in (select locality from locality_config where active = '1' limit 1)";
 
         $locality_result = pg_exec($db,$locality_sql);
@@ -37,9 +22,27 @@ $locality_sql = "select * from configuration where locality in (select locality 
         }
 
 
+$database = "radius";
+$user = "username";
+$pass = "password";
+$hostname = "localhost";
+
+
+$address = "123 Main Street <br>";
+$address .= "Suite 5 <br>";
+$address .= "Anywhere, VA <br>";
+$address .= "20119 <br>";
+$address .= "USA <br>";
+
+$yourtitle = "Ignite TRX";
+
+$payee = "Ignite TRX";
+$due = "payment due in 30 days";
+
+$site = "http://www.ignitetrx.com";
+
 //change 'yes' to 'no' if you dont want emails sent to clients thanking them when invoices are paid
 $emailoption = 'no';
-
 
 // Display error messages
 function DisplayErrMsg($message) {

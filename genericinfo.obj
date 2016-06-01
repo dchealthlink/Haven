@@ -1,0 +1,119 @@
+<?php
+
+class genericinfo {
+
+    //Set up the Object, reserving memory space for variables
+            
+    var $outerwidth;
+    var $outerbordercolor;
+    var $outerborderwidth;
+    var $titlebgcolor;
+    var $innerwidth;
+    var $innerbgcolor;
+    
+    // Textual variables
+    var $title;
+            
+    // Style vairables
+    var $cssboxtitle;
+            
+    /*
+        Use these functions to get and set the values of this 
+        object's variables. This is good OO practice, as it means 
+        that datatype checking can be completed and errors raised accordingly.
+    */    
+    function setouterwidth($req_outerwidth) {
+        $this->outerwidth = $req_outerwidth;
+    }
+            
+    function getouterwidth() {
+        return $this->getouterwidth;
+    }
+            
+    function setouterbordercolor($req_outerbordercolor) {
+        $this->outerbordercolor = $req_outerbordercolor;
+    }
+            
+    function getouterbordercolor() {
+        return $this->outerbordercolor;
+    }
+            
+    function setouterborderwidth($req_outerborderwidth) {
+        $this->outerborderwidth = $req_outerborderwidth;
+    }
+    function getouterborderwidth() {
+        return $this->outerborderwidth;
+    }
+            
+    function settitlebgcolor($req_titlebgcolor) {
+        $this->titlebgcolor = $req_titlebgcolor;
+    }
+            
+    function gettitlebgcolor() {
+        return $this->titlebgcolor;
+    }
+            
+    function setinnerwidth($req_innerwidth) {
+        $this->innerwidth = $req_innerwidth;
+    }
+            
+    function getinnerwidth() {
+        return $this->innerwidth;
+    }
+            
+    function setinnerbgcolor($req_innerbgcolor) {
+        $this->innerbgcolor = $req_innerbgcolor;
+    }
+    function getinnerbgcolor() {
+        return $this->innerbgcolor;
+    }
+            
+    function settitle($req_title) {
+        $this->title = $req_title;
+    }
+            
+    function gettitle() {
+        return $this->title;
+    }
+            
+    function setcssboxtitle($req_cssboxtitle) {
+        $this->cssboxtitle = $req_cssboxtitle;
+    }
+            
+    function getcssboxtitle() {
+        return $this->cssboxtitle;
+    }
+            
+    /*
+        This is the constructor for the object. In this case I have set the initial
+        values of a number of the object properties to those values declared in the 
+        global constants.inc. By doing this, I only need to change the values of 
+        these properties for specific operations, which we will not need to
+        do throughout this example
+    */    
+    function genericinfo() {
+                
+        global $COLOR_PRIMARY, $COLOR_SECONDARY, $COLOR_TERTIARY;
+        global $CSSBOXTITLE;
+    
+        $this->setouterwidth(150);
+        $this->setouterbordercolor($COLOR_TERTIARY);
+        $this->setouterborderwidth(1);
+        $this->settitlebgcolor($COLOR_PRIMARY);
+        $this->setinnerwidth(146);
+        $this->setinnerbgcolor($COLOR_SECONDARY);
+    
+        if (isset($CSSBOXTITLE)) {
+            $this->setcssboxtitle($CSSBOXTITLE);
+        }
+            
+    }
+    
+    // Methods
+            
+}
+
+/*
+You will no doubt notice from this that there are no methods for the class. Why? Well, I guess in a practical situation you might well choose to combine these three objects into one, simply changing the methods according to the desired box. However, this is a real-life example of using classes and sub-classes ("inheritance") and the reason I have chosen to sub-class is so that as I add more flavours of box (eg, curved corners), I can create further sub-class(es); increasing the portability of the right code.
+*/
+?>
