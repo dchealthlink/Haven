@@ -1,0 +1,64 @@
+<STYLE>
+.bugresolver {
+
+}
+TD {
+	font-family:		verdana, arial, courier;
+	font-size:		10;
+}
+
+P {
+	font-family:		verdana, arial, courier;
+	font-size:		20;
+}
+		
+A {
+	font-family:		verdana, arial, courier;
+	font-size:		12;
+	color:			#000084;
+	text-decoration:	none;
+	font-weight:		bold;
+	text-align:		right;
+}
+
+A:hover {
+	font-family:		verdana, arial, courier;
+	font-size:		12;
+	color:			#990000;
+	background-color:	#DCDADA;
+	text-decoration:	none;
+	font-weight:		bold;
+	text-align:		right;
+}
+
+UL {
+	margin-left:		25;
+}
+.boxtitle {
+	font-family:		verdana, arial, courier;
+	font-size:		14;
+	color:			#FFFFFF;
+	font-weight:		bold;
+	text-align:		center;
+}
+
+.lnkBox {
+	font-family:		verdana, arial, courier;
+	font-size:		10;
+	color:			#000084;
+	margin-left:		5px;
+	text-align:		left;
+}
+</STYLE>
+<?php
+/*
+Example/Download
+For those of you who would like to download this example and give it a try for yourself, a ZIP archive is attached.
+mark20000727.zip
+To Those Of You With OO Expereice
+I am well aware there are a number of "holes" in ths code. For example, I have not completed and data validation when setting and returning property values. However, bear in mind the purpose of this exercise is to give people a "real-world" example (which they can follow) of the process and function of OO within PHP.
+To Those Of You Without OO Experience
+This is a "real-world" example of the process and function of OO within PHP. There are a number of "holes" within the code. That is no to sat the code is incorrect or wrong, but its function is to show you how to work with OO.
+If you're looking for further guidance on developing this code into your site, you should revisit many of the get and set functions within these pages and make sure you develop routines to handle the data being parsed; make sure it is of the correct data-type (eg it is numeric when it should be and it is a valid SQL statement when it should be). Bear in mind, the data these classes are working with is from a pre-populated database, where I knew the data was valid etc....
+*/
+?>

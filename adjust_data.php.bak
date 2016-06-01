@@ -1,0 +1,123 @@
+<?php 
+$applid = $_GET['applId'];
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+"http://www.w3.org/TR/html4/loose.dtd"> 
+<html> 
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<title>Adjustments</title> 
+
+<style type="text/css"> 
+<!-- 
+body { 
+    font-family: Arial, Helvetica, sans-serif; 
+    text-align:center; 
+} 
+p { 
+    font-size: 14px; 
+    line-height: 20px; 
+} 
+#main { 
+    width:800px; 
+    margin:0 auto; 
+    padding:10px; 
+    text-align:left; 
+    border: 1px solid #000000; 
+} 
+--> 
+</style> 
+<script language = "Javascript">
+function calculate_adjustments() {
+
+var f23 = document.getElementById("f23");
+var f24 = document.getElementById("f24");
+var f25 = document.getElementById("f25");
+var f26 = document.getElementById("f26");
+var f27 = document.getElementById("f27");
+var f28 = document.getElementById("f28");
+var f29 = document.getElementById("f29");
+var f30 = document.getElementById("f30");
+var f31a = document.getElementById("f31a");
+var f32 = document.getElementById("f32");
+var f33 = document.getElementById("f33");
+var f34 = document.getElementById("f34");
+var f35 = document.getElementById("f35");
+var f36 = document.getElementById("totalAdjustment");
+
+f36.value = parseInt(f23.value || "0" ) + parseInt(f24.value  || "0" ) + parseInt(f25.value || "0" ) + parseInt(f26.value || "0" ) + parseInt(f27.value || "0" ) + parseInt(f28.value || "0" ) + parseInt(f29.value || "0" ) + parseInt(f30.value || "0" ) + parseInt(f31a.value || "0" ) + parseInt(f32.value || "0" ) + parseInt(f33.value || "0" ) + parseInt(f34.value || "0" ) + parseInt(f35.value || "0" ) ;  
+
+ window.opener.mainform.MagiDeductions.value=f36.value;
+ window.opener.mainform.MagiDeductions.readOnly=true;
+
+}
+</script>
+</head> 
+
+<body> 
+<!-- <body onLoad="javascript:window.resizeTo(425,400);return false;">  -->
+<div id="main"> 
+  <h2 style="text-align:center;margin-top:10px;">Adjustments</h2> 
+
+Adjusted Gross Income
+<br><br>
+
+<table bgcolor="#DCDCDC">
+
+<tr><td>23</td><td>Educator expenses:</td><td>23</td><td> <input type="text" id="f23" name="educatorExpenses" size="6" onchange="calculate_adjustments();"> </td> <td>&nbsp;</td>
+</tr>
+
+
+<tr><td>24</td><td>Certain business expenses of reservists, performing artists and fee-basis government officials:</td><td>24</td><td> <input type="text" id="f24" name="businessExpenses" size="6" onchange="calculate_adjustments();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>25</td><td>Health savings account deduction:</td><td>25</td><td> <input type="text" id="f25" name="monthlyTaxableInterest" size="6" onchange="calculate_adjustments();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>26</td><td>Moving expenses:</td><td>26</td><td> <input type="text" id="f26" name="monthlyTaxableInterest" size="6" onchange="calculate_adjustments();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>27</td><td>Deductible part of self-employment tax:</td><td>27</td><td> <input type="text" id="f27" name="monthlyTaxableInterest" size="6" onchange="calculate_adjustments();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>28</td><td>Self-employed SEP, SIMPLE and qualified plans:</td><td>28</td><td> <input type="text" id="f28" name="monthlyTaxableInterest" size="6" onchange="calculate_adjustments();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>29</td><td>Self-employed health insurance deduction:</td><td>29</td><td> <input type="text" id="f29" name="monthlyTaxableInterest" size="6" onchange="calculate_adjustments();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>30</td><td>Penalty on early withdrawal of savings:</td><td>30</td><td> <input type="text" id="f30" name="monthlyTaxableInterest" size="6" onchange="calculate_adjustments();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>31a</td><td>Alimony paid:</td><td>31a</td><td> <input type="text" id="f31a" name="monthlyTaxableInterest" size="6" onchange="calculate_adjustments();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>32</td><td>IRA deduction:</td><td>32</td><td> <input type="text" id="f32" name="monthlyTaxableInterest" size="6" onchange="calculate_adjustments();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>33</td><td>Student Loan interest deduction:</td><td>33</td><td> <input type="text" id="f33" name="monthlyTaxableInterest" size="6" onchange="calculate_adjustments();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>34</td><td>Tuition and fees:</td><td>34</td><td> <input type="text" id="f34" name="monthlyTaxableInterest" size="6" onchange="calculate_adjustments();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>35</td><td>Domestic production activities deduction:</td><td>35</td><td> <input type="text" id="f35" name="monthlyTaxableInterest" size="6" onchange="calculate_adjustments();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>36</td><td><b>Total Adjustments:</b></td><td>36</td><td> <input type="text" id="totalAdjustment" name="totalAdjustment" readonly size="6" > </td> <td>&nbsp;</td>
+</tr>
+
+</table>
+<br>
+<input class="gray" type="SUBMIT" name="submit" value="submit" >&nbsp;
+<input type="hidden" name="applid" value="<?php echo $applid ?>" >
+<input type="hidden" name="personid" value="<?php echo $personid ?>" >
+
+
+
+</div>   
+<br><br>
+<input class="gray" type="Button" name="WINDOWCLOSE" value="Window Close" onclick="javascript:window.close()">&nbsp;
+
+</body> 
+</html> 

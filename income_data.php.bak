@@ -1,0 +1,160 @@
+<?php 
+$applid = $_GET['applId'];
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+"http://www.w3.org/TR/html4/loose.dtd"> 
+<html> 
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<title>Adjustments</title> 
+
+<style type="text/css"> 
+<!-- 
+body { 
+    font-family: Arial, Helvetica, sans-serif; 
+    text-align:center; 
+} 
+p { 
+    font-size: 14px; 
+    line-height: 20px; 
+} 
+#main { 
+    width:800px; 
+    margin:0 auto; 
+    padding:10px; 
+    text-align:left; 
+    border: 1px solid #000000; 
+} 
+--> 
+</style> 
+<script language = "Javascript">
+function calculate_income() {
+
+var f7 = document.getElementById("f7");
+var f8a = document.getElementById("f8a");
+var f8b = document.getElementById("f8b");
+var f9a = document.getElementById("f9a");
+var f10 = document.getElementById("f10");
+var f11 = document.getElementById("f11");
+var f12 = document.getElementById("f12");
+var f13 = document.getElementById("f13");
+var f14 = document.getElementById("f14");
+var f15b = document.getElementById("f15b");
+var f16b = document.getElementById("f16b");
+var f17 = document.getElementById("f17");
+var f18 = document.getElementById("f18");
+var f19 = document.getElementById("f19");
+var f20b = document.getElementById("f20b");
+var f21 = document.getElementById("f21");
+var f22 = document.getElementById("totalIncome");
+
+f22.value = parseInt(f7.value || "0" ) + parseInt(f8a.value  || "0" )  + parseInt(f8b.value  || "0" )   + parseInt(f9a.value || "0" ) + parseInt(f10.value || "0" ) + parseInt(f11.value || "0" ) + parseInt(f12.value || "0" ) + parseInt(f13.value || "0" ) + parseInt(f14.value || "0" ) + parseInt(f15b.value || "0" ) + parseInt(f16b.value || "0" ) + parseInt(f17.value || "0" ) + parseInt(f18.value || "0" ) + parseInt(f19.value || "0" )  + parseInt(f20b.value || "0" ) + parseInt(f21.value || "0" )         ;  
+
+ window.opener.mainform.Wages.value=f7.value;
+ window.opener.mainform.monthlyWages.value=  (parseInt(f7.value || "0"))/12;
+
+ window.opener.mainform.TaxableInterest.value=f8a.value;
+ window.opener.mainform.monthlyTaxableInterest.value=  (parseInt(f8a.value || "0"))/12;
+
+ window.opener.mainform.PensionAnnuities.value= parseInt(f9a.value || "0") + parseInt(f13.value || "0") + parseInt(f15b.value || "0") + parseInt(f16b.value || "0") + parseInt(f20b.value || "0");
+ window.opener.mainform.monthlyPensionAnnuities.value=  (parseInt(f9a.value || "0") + parseInt(f13.value || "0") + parseInt(f15b.value || "0") + parseInt(f16b.value || "0") + parseInt(f20b.value || "0"))/12;
+
+ window.opener.mainform.TaxExemptInterest.value=f8b.value;
+ window.opener.mainform.monthlyTaxExemptInterest.value=  (parseInt(f8b.value || "0"))/12;
+
+ window.opener.mainform.FarmIncome.value=f18.value;
+ window.opener.mainform.monthlyFarmIncome.value=  (parseInt(f18.value || "0"))/12;
+
+ window.opener.mainform.TaxRefunds.value=f10.value;
+ window.opener.mainform.monthlyTaxRefunds.value=  (parseInt(f10.value || "0"))/12;
+
+ window.opener.mainform.UnemployIncome.value=f19.value;
+ window.opener.mainform.monthlyUnemployIncome.value=  (parseInt(f19.value || "0"))/12;
+
+ window.opener.mainform.Alimony.value=f11.value;
+ window.opener.mainform.monthlyAlimony.value=  (parseInt(f11.value || "0"))/12;
+
+ window.opener.mainform.OtherIncome.value= parseInt(f12.value || "0") + parseInt(f14.value || "0") + parseInt(f17.value || "0") + parseInt(f21.value || "0");
+ window.opener.mainform.monthlyOtherIncome.value=  (parseInt(f12.value || "0") + parseInt(f14.value || "0") + parseInt(f17.value || "0") + parseInt(f21.value || "0"))/12;
+
+
+}
+</script>
+</head> 
+
+<body> 
+<!-- <body onLoad="javascript:window.resizeTo(425,400);return false;">  -->
+<div id="main"> 
+  <h2 style="text-align:center;margin-top:10px;">Income</h2> 
+
+Adjusted Gross Income
+<br><br>
+
+<table bgcolor="#DCDCDC">
+
+<tr><td>7</td><td>Wages, salaries, tips, etc.:</td><td>7</td><td> <input type="text" id="f7" name="wages" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+
+<tr><td>8a</td><td>Taxable interest:</td><td>8a</td><td> <input type="text" id="f8a" name="taxableInterest" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>8b</td><td>Tax-Exempt interest:</td><td>8b</td><td> <input type="text" id="f8b" name="taxExemptInterest" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>9a</td><td>Ordinary dividends:</td><td>9a</td><td> <input type="text" id="f9a" name="ordinaryDividends" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>10</td><td>Taxable refunds, credits or offsets of state and local income taxes:</td><td>10</td><td> <input type="text" id="f10" name="taxableRefunds" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>11</td><td>Alimony received:</td><td>11</td><td> <input type="text" id="f11" name="alimony" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>12</td><td>Business income (or loss):</td><td>12</td><td> <input type="text" id="f12" name="businessIncome" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>13</td><td>Capital gain (or loss):</td><td>13</td><td> <input type="text" id="f13" name="capitalGains" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>14</td><td>Other gains (or losses):</td><td>14</td><td> <input type="text" id="f14" name="otherGains" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>15b</td><td>IRA distributions:</td><td>15b</td><td> <input type="text" id="f15b" name="iraDistributions" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>16b</td><td>Pensions and annuities:</td><td>16b</td><td> <input type="text" id="f16b" name="pensionsAnnuities" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>17</td><td>Rental real estate, royalties, partnerships, S corporations, trusts, etc.:</td><td>17</td><td> <input type="text" id="f17" name="realestatePlus" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>18</td><td>Farm income:</td><td>18</td><td> <input type="text" id="f18" name="farmIncome" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>19</td><td>Unemployment compensation:</td><td>19</td><td> <input type="text" id="f19" name="unemployment" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>20b</td><td>Social security benefits:</td><td>20b</td><td> <input type="text" id="f20b" name="socialSecurity" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>21</td><td>Other income:</td><td>21</td><td> <input type="text" id="f21" name="otherIncome" size="6" onchange="calculate_income();"> </td> <td>&nbsp;</td>
+</tr>
+
+<tr><td>22</td><td><b>Total Income:</b></td><td>22</td><td> <input type="text" id="totalIncome" name="totalIncome" readonly size="6" > </td> <td>&nbsp;</td>
+</tr>
+
+</table>
+<br>
+<input class="gray" type="SUBMIT" name="submit" value="submit" >&nbsp;
+<input type="hidden" name="applid" value="<?php echo $applid ?>" >
+<input type="hidden" name="personid" value="<?php echo $personid ?>" >
+
+
+
+</div>   
+<br><br>
+<input class="gray" type="Button" name="WINDOWCLOSE" value="Window Close" onclick="javascript:window.close()">&nbsp;
+
+</body> 
+</html> 

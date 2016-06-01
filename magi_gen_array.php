@@ -1,0 +1,363 @@
+<?php
+session_start();
+include("inc/dbconnect.php");
+if (!$_GET['applId']) {
+	$applid = '153620001';
+} else {
+	$applid = $_GET['applId'] ;
+}
+
+$relsql = "SELECT statecd, appyear, name FROM application WHERE applid = '".$applid."'";
+$relresult = execSql($db, $relsql, $debug) ;
+list ($stateCd, $appYear, $appName) = pg_fetch_row($relresult, 0);
+
+
+$prej_value = '{"State": "'.$stateCd.'", "Application Year": '.$appYear.', "Name" : "'.$appName.'",  ';
+$pre_person_value = '"People" : [ ';
+$person_value = '{ ';
+$end_person_value = '} ,';
+$end_pre_person_value = ' ] , ';
+
+$income_value = '"Income" : { ' ;
+$end_income_value = '} , ' ;
+
+$pre_relate_value = '"Relationships" : [ ';
+$relate_value = ' { ';
+$end_relate_value = ' } ,';
+$end_pre_relate_value = ' ] ' ;
+
+$pre_household_value = '  "Physical Households": [ { ';
+$end_pre_household_value = "  ] } ],";
+
+$pre_tax_value = '  "Tax Returns": [{ ';
+$end_pre_tax_value = " ] }  ] ";
+
+// if ($formsubmit) {
+
+
+$arr_a_sql = "select magi_label, field_name from table_label_xref where table_name = 'application_person' ";
+$arr_a_result = execSql($db, $arr_a_sql, $debug) ;
+$data = array();
+while ($row = pg_fetch_row($arr_a_result)) {
+	$data[$row[0]] = $row[1] ;
+}
+
+
+$arr_b_sql = "select * FROM application_person where applid = '".$applid."' ";
+$arr_b_result = execSql($db, $arr_b_sql, $debug) ;
+
+        $numrows = pg_numrows($arr_b_result);
+if ($numrows > 0) {
+        $numfields = pg_numfields($arr_b_result);
+} else {
+        echo ("<tr><td><b>No Rows Returned</b></td></tr>");
+}
+
+$datab = array();
+	for ($i=0;$i<$numrows;$i++) {
+
+        	$rowarr = pg_fetch_row($arr_b_result,$i);
+		$personid = $rowarr[1] ;
+        	for ($j=0;$j<$numfields;$j++) {
+
+
+	        	$fldname = pg_fieldname($arr_b_result,$j);
+			$fldtype = pg_fieldtype($arr_b_result,$j);
+        	        $val = $rowarr[$j];
+			$foundval = array_search($fldname,$data)  ;
+//			if ($val and $val != '0.00' and $foundval) {
+			if (($val or $fldname == 'hrsworked') and  $foundval) {
+				switch ($fldtype) {
+				case 'int2':
+				case 'int8':
+					$datab[$i][$foundval] = $val  ;
+					$person_guts.= '"'.$foundval.'" : '.$val.' ,';
+				break;
+				case 'numeric':
+					$datab[$i][$foundval] = $val  ;
+					$income_guts.= '"'.$foundval.'" : '.$val.' ,';
+				break;
+				default:
+					$datab[$i][$foundval] = $val  ;
+					$person_guts.= '"'.$foundval.'" : "'.$val.'" ,';
+
+				}
+
+
+			}	
+		}
+
+		$relsql = "select a.cross_personid, b.relationship_code, coalesce(a.cross_primaryresponsibility,'N') from application_relationship a, relationship_code b where a.cross_relationship = b.relationship and a.applid = '".$applid."' and a.personid = '".$personid."'
+ 		union
+ 		select a.personid, b.relationship_code, coalesce(a.primaryresponsibility,'N') from application_relationship a, relationship_code b where a.relationship = b.relationship and a.applid = '".$applid."' and a.cross_personid = '".$personid."' ";
+
+		$relsql = "select a.cross_personid, b.relationship_code, coalesce(a.cross_primaryresponsibility,'N') from application_relationship a, relationship_code b where a.relationship = b.relationship and a.applid = '".$applid."' and a.personid = '".$personid."'
+ 		union
+ 		select a.personid, b.relationship_code, coalesce(a.primaryresponsibility,'N') from application_relationship a, relationship_code b where a.cross_relationship = b.relationship and a.applid = '".$applid."' and a.cross_personid = '".$personid."' ";
+
+		$relresult = execSql($db, $relsql, $debug) ;
+		$rownum = 0;
+		$relrows = pg_numrows($relresult) ;
+		if ($relrows > 0) {
+
+			while ($row = pg_fetch_array($relresult,$rownum)) {
+				list ($xpersid, $xrelcd, $xprimary) = pg_fetch_row($relresult,$rownum);
+				$relate_guts.= $relate_value.'"Other ID" : '.$xpersid.', "Relationship Code": "'.$xrelcd.'", "Attest Primary Responsibility": "'.$xprimary.'" '.$end_relate_value;
+				$rownum = $rownum + 1;
+			}
+
+		} else {
+		$relate_guts = '';
+		}
+	$datastring.= $person_value.$person_guts.$income_value.(substr($income_guts,0,-1)).$end_income_value.$pre_relate_value.(substr($relate_guts,0,-1)).$end_pre_relate_value.$end_person_value ;
+
+	$relate_guts = '';
+	$person_guts = '';
+	$income_guts = '';
+	}
+
+/* ------------------ household ------------------------- */
+$hh_sql = "select householdid, personid FROM application_household where applid = '".$applid."' order by 1, 2 ";
+
+$hh_result = execSql($db, $hh_sql, $debug) ;
+
+        $numrows = pg_numrows($hh_result);
+if ($numrows > 0) {
+
+$rownum = 0;
+$prevhhid = 'first';
+	while ($row = pg_fetch_array($hh_result,$rownum)) {
+
+		if ($row['householdid'] == $prevhhid) {
+			$household_guts.= ' { "Person ID": '.$row['personid'].' } ,' ;
+		} else {
+
+			if ($prevhhid != 'first') {
+				$household_guts = substr($household_guts,0,-1).' ] } , { ';
+			}
+
+			$household_guts.= ' "Household ID": "'.$row['householdid'].'", "People": [{ "Person ID": '.$row['personid'].' } ,' ;
+			$prevhhid = $row['householdid'] ;
+		}
+		$rownum = $rownum + 1 ;
+	}
+		$household_guts = substr($household_guts,0,-1) ;
+
+} else {
+ 	$household_guts = '   
+      		"Household ID": "Household1",
+      		"People": [	{
+          	"Person ID": '.$personid.' }
+        	 ' ;
+}
+/* ------------------ end household ------------------------- */
+/* ------------------ tax ------------------------- */
+$taxsql = "select tax_no, filer_type, personid FROM application_tax where applid = '".$applid."' order by 1, 2 desc ";
+
+$taxresult = execSql($db, $taxsql, $debug) ;
+
+        $numrows = pg_numrows($taxresult);
+if ($numrows > 0) {
+
+$rownum = 0;
+$prevtno = 'first';
+$prevtft = 'first';
+	while ($row = pg_fetch_array($taxresult,$rownum)) {
+
+		if ($row['tax_no'] == $prevtno) {
+			if ($row['filer_type'] == $prevtft ) {
+					$tax_guts.= ' { "Person ID": '.$row['personid'].' } ,' ;
+			} else {
+				if ($prevtft != 'first') {
+					$tax_guts = substr($tax_guts,0,-1).'  ';
+				}
+				if ($row['personid'] != '') {
+				$tax_guts.= '  ], "'.$row['filer_type'].'":  [ { "Person ID": '.$row['personid'].' } ,' ;
+				} else {
+				$tax_guts.= ' ], "'.$row['filer_type'].'":  [  ' ;
+				}
+				$prevtft = $row['filer_type'] ;
+			}
+		} else {
+
+			if ($prevtno != 'first') {
+				$tax_guts = substr($tax_guts,0,-1).'],  ';
+			}
+				if ($row['personid']) {
+				$tax_guts.= ' "'.$row['filer_type'].'":  [ { "Person ID": '.$row['personid'].' } ,' ;
+				} else {
+				$tax_guts.= ' "'.$row['filer_type'].'":  [ ' ;
+				}
+				$prevtno = $row['tax_no'] ;
+				$prevtft = $row['filer_type'] ;
+		}
+		$rownum = $rownum + 1 ;
+	}
+} else {
+ 	$tax_guts = '   
+      		"Filers": [],
+		"Dependents": [ ' ;
+}
+
+/* ------------------ end tax ------------------------- */
+
+	$datastring = $prej_value.$pre_person_value.(substr($datastring,0,-1)).$end_pre_person_value.$pre_household_value.$household_guts.$end_pre_household_value.$pre_tax_value.(substr($tax_guts,0,-1)).$end_pre_tax_value." } " ;
+
+
+$show_menu="ON";
+
+ include("inc/index_header_inc.php"); 
+?>
+<HTML>
+<head>
+<script language = "Javascript">
+</script>
+</head>
+<tr><td>
+  <blockquote>
+   <h1>HAVEN - POC <?php echo $rep_name ?></h1>
+<br><a href="search_application_gen.php?appl_id=<?php echo $applid ?>">Review Application</a>
+
+ <form name="mainform" method="post" action="haven_magi_c.php">
+
+	<table border=0 cellspacing=0 cellpadding=2 bordercolor=#eeeeee width=900> 
+
+<?php
+
+
+ echo "<tr><td colspan=6>&nbsp;</td></tr>";
+
+$datastringx= '
+{"State": "DC", "Application Year": 2015, "Name" : "whatever the name is ", "People" : [{ "Person ID" : 1000011, "Is Applicant" : "Y", "Applicant Age" : 58, "Hours Worked Per Week" : 40, "Applicant Attest Blind or Disabled" : "N", "Student Indicator" : "N", "Medicare Entitlement Indicator" : "N", "Lives In State" : "Y", "Applicant Attest Long Term Care" : "N", "Claimed as dependent by Person Not on Application" : "N", "Has Insurance" : "N", "Prior Insurance" : "N", "US Citizen Indicator" : "Y", "Required to File Taxes" : "Y", "Claimer Is Out of State" : "N", "Refugee Status" : "N", "Income" : { "Wages, Salaries, Tips" : 24000.00, "MAGI Deductions" : 0 } , "Relationships" : [] } ], "Physical Households": [ { "Household ID": "Household1", "People": [ { "Person ID": 1 } ] } ], "Tax Returns": [ { "Filers": [], "Dependents": [] } ] } ';
+
+if ($_SESSION['userid'] == '00001') {
+	echo "<br><br>".$datastring."<br><br>";
+}
+
+include("mitc_inc.php") ;
+
+$deresult = json_decode($result,true) ;
+
+foreach($deresult as $prop => $value) {
+        if ( is_array($value)) {
+                echo "<br><br><b>".$prop."</b> ==> ";
+                foreach($value as $prop1 => $value1) {
+                        if ( is_array($value1)) {
+                        echo "<br><br><b>".$prop1."</b> ==> ";
+                        // echo "<br><br>Level1:".$prop1." ==> ";
+                                foreach($value1 as $prop2 => $value2) {
+                                        if (is_array($value2) ) {
+                                        echo "<br><br><b>".$prop2."</b> ==> ";
+                                        // echo "<br><br>Level2: ".$prop2." ==> ";
+                                                foreach($value2 as $prop3 => $value3) {
+                                                        if (is_array($value3) ) {
+                                                        echo "<br><br><b> ".$prop3."</b> ==>";
+                                                        // echo "<br><br>Level3: ".$prop3." ==>";
+								$fldarray = 'applId, personId,'.$prop2.',';
+								$dataarray = "'".$applid."','".$personID."','".$prop3."',";
+//								$dataarray = "'".$_POST['applId']."','".$personID."','".$prop3."',";
+                                                                foreach($value3 as $prop4 => $value4) {
+									$fldarray.= str_replace(" ","",$prop4).',' ;
+									$dataarray.= "'".(str_replace("'","",$value4))."',";
+                                                                        echo '<br>'.$prop4.' : '.$value4;
+                                                                }
+								if (stristr($fldarray,'Determinations')) {
+									$exsql = 'INSERT into application_determination ('.substr($fldarray,0,-1).') VALUES ('.substr($dataarray,0,-1).')';
+									$exresult = execSql($db, $exsql, $debug) ;
+//									echo '<br>'.$exsql.'<br>';
+								}
+								
+                                                        } else {
+								$prop2x = $prop2;
+                                                                echo '<br>'.$prop3.' : '.$value3;
+                                                                // echo '<br>Level3a: '.$prop3.' : '.$value3;
+                                                		$l3asql = "INSERT INTO application_result values ( '".$applid."','".$personID."','".$prop2."', '".(str_replace("'","",$prop3))."' , '".(str_replace("'","",$value3))."')";
+						$exresult = execSql($db, $l3asql, $debug) ;
+                                                        }
+                                                }
+                                        } else {
+                                                echo '<br>'.$prop2.' : '.$value2;
+                                                // echo '<br>Level2a: '.$prop2.' : '.$value2;
+                                                $l2asql = "INSERT INTO application_result values ( '".$applid."','".$personID."','".$prop2x."', '".$prop2."' , '".(str_replace("'","",$value2))."')";
+						$exresult = execSql($db, $l2asql, $debug) ;
+						if ($prop2 == 'Person ID') {
+							$personID = $value2 ;
+						}
+                                        }
+                                }
+                        } else {
+                                echo '<br>Level1a: '.$prop1.' : '.$value1;
+                                // echo '<br>Level1a: '.$prop1.' : '.$value1;
+                        }
+                }
+        } else {
+                echo '<br/>'. $prop .' : '. $value;
+                // echo '<br/>Level0a: '. $prop .' : '. $value;
+        }
+}
+
+
+
+/* --------------------------  check for aptc  --------------------------------  */
+
+$presql = "SELECT personid FROM application_determination WHERE applid = ".$applid." and determinations = 'APTC Referral' and indicator = 'Y' order by 1";
+$preresult = execSql($db, $presql, $debug) ;
+$totBenchmark = 0;
+while ($row = pg_fetch_row($preresult)) {
+	$aptcPersonId = $row[0] ;
+	
+
+
+
+	$sql = "select a.applid, a.personid, a.applage, a.ispregnant, (select count(*) from application_relationship WHERE applid = ".$applid." and personid = '".$aptcPersonId."' and relationship in ('Parent','Stepparrent')) as numchildren, coalesce(a.numchildren,0) as pending_children, case when coalesce(a.numchildren,0) > 0 then 'Y' else 'N' end as parent_caretaker, (a.wages+a.taxableinterest+a.pensionannuities+a.taxexemptinterest+a.farmincome+a.taxrefunds+a.unemployincome+a.alimony+a.otherincome+a.magideductions) as total_wages, (select count(*) from application_household where applid = ".$applid."  and householdid in (select    householdid from application_household where applid = ".$applid." and personid = '".$aptcPersonId."')) as householdsize from application_person a where a.applid = ".$applid." and a.personid = '".$aptcPersonId."' ";
+	$result = execSql($db, $sql, $debug);
+	list ($happlid, $user, $age, $isPregnant, $numberKids, $pendkids, $isParent, $annualIncome, $householdSize ) = pg_fetch_array($result, 0) ;
+	$totIncome = $totIncome + $annualIncome;
+	$totExpKids = $totExpKids + $numberKids;
+	$hhSize = $hhSize + 1;
+
+	$aquery = "SELECT monthly_premium FROM annual_benchmark WHERE fpl_year = '2015' and ".$age." between start_age and end_age ";
+	$aresult = execSql($db, $aquery, $debug);
+	list ($moPremium) = pg_fetch_array($aresult, 0);
+	$totBenchmark = $totBenchmark + $moPremium ;
+
+
+
+//	$datastring = '{ "aptcPersonId": '.$aptcPersonId.', "annualIncome": '.$annualIncome.', "user": '.$user.', "age": '.$age.', "isPregnant": "'.$isPregnant.'", "isParent": "'.$isParent.'", "householdSize": '.($householdSize > 0 ? $householdSize : 1).', "numberKids": '.$numberKids.', "responseFormat": "json" } ';
+//	echo "<br>".$datastring."<br>";
+
+}
+
+if ($hhSize > 0) {
+	$annualBenchmark = $totBenchmark * 12;
+
+	$datastring = '{ "aptcName": "'.$appName.'" , "requestYear": "'.$appYear.'", "applid" : "'.$happlid.'", "annualIncome": '.$totIncome.', "user": '.$user.', "householdSize": '.($hhSize > 0 ? $hhSize : 1).', "numberKids": '.$totExpKids.',   "annualBenchmark": '.$annualBenchmark.',    "responseFormat": "json" } ';
+
+	include ("call_ws_inc.php");
+} else {
+	echo "<br><br>";
+	echo "<br><font size=+1><b>No APTC calculation - no family members qualify</font><br>";
+}
+/* --------------------------  end aptc check  -------------------------------- */
+
+?>
+
+
+
+    <tr><td colspan=6>&nbsp;</td></tr>
+    <tr><td colspan=6>&nbsp;</td></tr>
+
+
+
+    <tr>
+    <td colspan=2><input class="gray" type="Submit" name="formreturn" value="return"></td></tr>
+</table>
+    </p>
+  </form>
+</blockquote>
+<?
+
+include "inc/footer_inc.php";
+?>
+</body>
+</HTML>
